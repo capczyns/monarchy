@@ -1,14 +1,15 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
+#include <string>
 class System{
 private:
 	void login();
 	void quit();
-	bool importExport();
-	void createSighting();
+	std::string importExport();
+	std::string createSighting();
 	void viewUsers();
 	bool deleteAccount();
-	bool manageSightings();
+	std::string manageSightings();
 	void reports();
 	void mainMenu();
 	void clear();

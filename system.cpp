@@ -1,6 +1,5 @@
 #include "system.h"
 #include <iostream>
-#include <string>
 void System::start(){
 	/*
 		Starts the Butterfly Tracking System
@@ -18,7 +17,7 @@ void System::quit(){
 		Handles quitting the program
 	*/
 }
-bool System::importExport(){
+std::string System::importExport(){
 	/*
 		Handles file import and export
 	*/
@@ -42,17 +41,19 @@ bool System::importExport(){
 		switch(line[0]){
 			case '1':
 				std::cout << "\nCheck import data and whatnot ";
+				prompt = "File Import Success/Fail";
 				break;
 			case '2':
 				std::cout << "\nExport sightings to file ";
+				prompt = "File Export Success/Fail";
 				break;
 		};
 		std::getline(std::cin, line);
-		return true;
+		return prompt;
 	}
-	return false;
+	return "File operation cancelled.";
 }
-void System::createSighting(){
+std::string System::createSighting(){
 	/*
 		Handles creating a sighting
 	*/
@@ -86,8 +87,10 @@ void System::createSighting(){
 			std::getline(std::cin, line);
 			break;
 		default:
+			return "Sighting creation cancelled.";
 			break;
 	};
+	return "Sighting created, ID = _____.";
 }
 void System::viewUsers(){
 	/*
@@ -155,7 +158,7 @@ bool System::deleteAccount(){
 	}
 	return false;
 }
-bool System::manageSightings(){
+std::string System::manageSightings(){
 	/*
 		Handles managing sightings
 	*/
@@ -167,6 +170,7 @@ bool System::manageSightings(){
 	std::string prompt = "\nChoose option: ";
 	std::string title;
 	bool cancelled = false;
+	bool deleted = false;
 	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
 		clear();
 		std::cout << "Sighting ID: " << sightID << '\n'
@@ -184,11 +188,18 @@ bool System::manageSightings(){
 			break;
 		case '2':
 			title = "Sighting ID: " + sightID + "\nDelete Sighting Menu:\n";
+			deleted = true;
 			break;
 		default:
 			cancelled = true;
 	};
-	if(!cancelled){
+	if(deleted){
+		return "Sighting " + sightID + " Deleted.";
+	}
+	if(cancelled){
+		return "Sighting " + sightID + " update cancelled.";
+	}
+	else{
 		line = "";
 		prompt = "\nChoose option: ";
 		while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
@@ -203,18 +214,18 @@ bool System::manageSightings(){
 		}
 		switch(line[0]){
 			case '1':
-				std::cout << "Sighting Information input";
+				std::cout << "Tagged Sighting Information Input";
 				std::getline(std::cin, line);
 				break;
 			case '2':
-				std::cout << "Try deleting Sighting ID " << sightID;
+				std::cout << "Untagged Sighting Information Input ";
 				std::getline(std::cin, line);
 				break;
 			case '3':
-				cancelled = true;
+				return "Sighting " + sightID + " update cancelled!";
 		};
 	}
-	return cancelled;
+	return "Sighting " + sightID + " update successful!";
 
 }
 void System::reports(){
@@ -297,26 +308,16 @@ void System::mainMenu(){
 					viewUsers();
 					break;
 				case '2':
-					if(manageSightings()){
-						prompt = "Sightings update cancelled\n" + prompt;
-					}
-					else{
-						prompt = "Sighting updated\n" + prompt;
-					}
+					prompt = manageSightings() + '\n' + prompt;
 					break;
 				case '3':
-					createSighting();
+					prompt = createSighting() + '\n' + prompt;
 					break;
 				case '4':
 					reports();
 					break;
 				case '5':
-					if(importExport()){
-						prompt = "File operation successful\n" + prompt;
-					}
-					else{
-						prompt = "File operation failed\n" + prompt;
-					}
+					prompt = importExport() + '\n' + prompt;
 					break;
 				case '6':
 					if(deleteAccount()){
