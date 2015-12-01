@@ -2,6 +2,7 @@
 #include "external/echoDisable.h"
 #include "external/ChrisHash.h"
 #include <iostream>
+#include <fstream>
 void System::start(){
 	/*
 		Starts the Butterfly Tracking System
@@ -12,17 +13,67 @@ void System::login(){
 	/*
 		Handles the login process
 	*/
-	std::string name, pwd;
-	std::cout << "Username: ";
-	std::getline(std::cin, name);
+	std::string name, pwd, prompt, line;
+	bool validName = false;
+	prompt = "Username: ";
+	while(!validName){
+		clear();
+		std::cout << prompt;
+		std::getline(std::cin, name);
+		validName = true;
+		for(size_t index = 0; validName && index < name.length(); index++){
+			validName = name[index] != ' ';
+		}
+		prompt = "Invalid name, spaces not allowed\nUsername: ";
+	}
 	std::cout << "Password: ";
 	chrisLibs::echo(false);
 	std::getline(std::cin, pwd);
 	chrisLibs::echo(true);
-	std::cout << "\nName = " + name + ", PW = " + pwd;
-	std::cout << "\nHashedPW = " + chrisLibs::sha256(pwd);
-	std::getline(std::cin, name);
-	mainMenu();
+	pwd = chrisLibs::sha256(pwd);
+
+	pwdFile = "pwdFile";
+	std::ifstream pwds(pwdFile);
+
+	bool correct = false;
+	bool separatorFound = false;
+	size_t pwdStart = 0;
+	if(pwds.is_open()){
+		while(!correct && std::getline(pwds, line)){
+			correct = true;
+			for(size_t index = 0; correct && index < line.length(); index++){
+				if(line[index] == ' '){
+					separatorFound = true;
+					pwdStart = index + 1;
+					correct = index == name.length();
+				}
+				else{
+					if(separatorFound){
+						correct = line[index] == pwd[index - pwdStart];
+					}
+					else{
+						correct = line[index] == name[index];
+					}
+				}
+			}
+			if(correct){
+				pwds.close();
+			}
+		}
+	}
+	if(pwds.is_open()){
+		pwds.close();
+	}
+	if(validName && correct){
+		/*
+			Set this user as logged in
+		*/
+		mainMenu();
+	}
+	else{
+		std::cout << "Invalid Username/Password";
+	}
+	//mainMenu();
 	/*
 		Read lines from file until I find username
 		If I don't find username or pwd doesn't match, inform user try again
