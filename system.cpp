@@ -1,5 +1,6 @@
 #include "system.h"
 #include "external/echoDisable.h"
+#include "external/ChrisHash.h"
 #include <iostream>
 void System::start(){
 	/*
@@ -18,6 +19,9 @@ void System::login(){
 	chrisLibs::echo(false);
 	std::getline(std::cin, pwd);
 	chrisLibs::echo(true);
+	std::cout << "\nName = " + name + ", PW = " + pwd;
+	std::cout << "\nHashedPW = " + chrisLibs::sha256(pwd);
+	std::getline(std::cin, name);
 	mainMenu();
 	/*
 		Read lines from file until I find username
