@@ -1,16 +1,28 @@
 #include "system.h"
+#include "external/echoDisable.h"
 #include <iostream>
 void System::start(){
 	/*
 		Starts the Butterfly Tracking System
 	*/
-	mainMenu();
+	login();
 }
 void System::login(){
 	/*
 		Handles the login process
 	*/
-	std::cout << "login\n";
+	std::string name, pwd;
+	std::cout << "Username: ";
+	std::getline(std::cin, name);
+	std::cout << "Password: ";
+	chrisLibs::echo(false);
+	std::getline(std::cin, pwd);
+	chrisLibs::echo(true);
+	mainMenu();
+	/*
+		Read lines from file until I find username
+		If I don't find username or pwd doesn't match, inform user try again
+	*/
 }
 void System::quit(){
 	/*
