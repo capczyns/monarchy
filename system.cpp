@@ -1,16 +1,120 @@
 #include "system.h"
+#include "external/echoDisable.h"
+#include "external/ChrisHash.h"
 #include <iostream>
+#include <fstream>
 void System::start(){
 	/*
 		Starts the Butterfly Tracking System
 	*/
-	mainMenu();
+	pwdFile = "pwdFile";
+	User::setNextId(Storage::fetchUsers(users) + 1);
+	loginMenu("");
 }
-void System::login(){
+bool System::createUser(){
+	std::string prompt = "User ID: ";
+	bool validInput = false;
+	std::string name, pwd, address, phone, tagId;
+
+	while(!validInput){
+		clear();
+		std::cout << prompt;
+		std::getline(std::cin, name);
+		validInput = true;
+		for(int index = 0; index < name.length() && validInput; index++){
+			validInput = name[index] != ' ';
+		}
+		if(validInput){
+			validInput = (users.find(name) == users.end());
+			if(!validInput){
+				prompt = "User ID already exists\nUser ID: ";
+			}
+		}
+		else{
+			prompt = "Spaces not allowed\nUser ID: ";
+		}
+	}
+	std::cout << "Password: ";
+	chrisLibs::echo(false);
+	std::getline(std::cin, pwd);
+	chrisLibs::echo(true);
+	pwd = chrisLibs::sha256(pwd);
+	std::cout << "\nAddress: ";
+	std::getline(std::cin, address);
+	std::cout << "Phone: ";
+	std::getline(std::cin, phone);
+	std::cout << "Tagger ID (leave blank for none): ";
+	std::getline(std::cin, tagId);
+	if(tagId.size() < 1){
+		tagId = "NOT TAGGER";
+	}
+	users[name] = User(name, pwd, address, phone, tagId);
+	Storage::storeUsers(users);
+	loginMenu("Account Created");
+}
+void System::loginMenu(std::string message){
+	std::string prompt = message + "\nEnter choice: ";
+	std::string line = "";
+	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
+		clear();
+		std::cout << "Login Menu:\n\n"
+				  << "1. Login\n"
+				  << "2. Create Account\n"
+				  << "3. Quit\n\n";
+
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		switch(line[0]){
+			case '1':
+				login("");
+				break;
+			case '2':
+				createUser();
+				break;
+			case '3':
+				std::cout << "Goodbye\n";
+		};
+		prompt = "Invalid Option\nEnter choice: ";
+	}
+}
+void System::login(std::string message){
 	/*
 		Handles the login process
 	*/
-	std::cout << "login\n";
+	std::string name, pwd, prompt, line;
+	bool validName = false;
+	prompt = message + "\n\nUsername: ";
+	while(!validName){
+		clear();
+		std::cout << prompt;
+		std::getline(std::cin, name);
+		validName = true;
+		for(size_t index = 0; validName && index < name.length(); index++){
+			validName = name[index] != ' ';
+		}
+		prompt = "Invalid name, spaces not allowed\nUsername: ";
+	}
+	std::cout << "Password: ";
+	chrisLibs::echo(false);
+	std::getline(std::cin, pwd);
+	chrisLibs::echo(true);
+	std::string holdPw = pwd;
+	pwd = chrisLibs::sha256(holdPw);
+	if(users.find(name) != users.end() && users[name].canLogin() && users[name].checkHash(pwd)){
+		/*
+			Log in the user
+		*/
+		currentUser = name;
+		mainMenu();
+	}
+	else{
+		loginMenu("Invalid Username/Password\n");
+	}
+	//mainMenu();
+	/*
+		Read lines from file until I find username
+		If I don't find username or pwd doesn't match, inform user try again
+	*/
 }
 void System::quit(){
 	/*
@@ -101,33 +205,14 @@ void System::viewUsers(){
 	std::string line = "";
 	std::string prompt = "\nType \"exit\" to exit or press enter for more: ";
 	size_t userNum = 0;
-	size_t numUsers = 127;
-	size_t digit;
-	size_t range;
-	while(userNum < numUsers && line.compare("EXIT") != 0){
-		for(int index = 0; index < 10 && userNum < numUsers; index++){
-			digit = ++userNum;
-			range = 0;
-			while(digit % 100 > 9){
-				digit -= 10;
-				range++;
-			}
-			std::cout << userNum;
-			if(digit % 100 == 1 && range != 1){
-				std::cout << "st";
-			}
-			else if(digit % 100 == 2 && range != 1){
-				std::cout << "nd";
-			}
-			else if(digit % 100 == 3 && range != 1){
-				std::cout << "rd";
-			}
-			else{
-				std::cout << "th";
-			}
-			std::cout << " User displayed\n";
+	size_t numUsers = users.size();
+	std::map<std::string, User>::iterator iter = users.begin();
+	while(iter != users.end() && line.compare("EXIT") != 0){
+		for(int index = 0; index < 10 && iter != users.end(); ++index){
+			std::cout << iter->second << '\n';
+			++iter;
 		}
-		if(userNum >= numUsers){
+		if(iter != users.end()){
 			prompt = "\nEnter to proceed: ";
 		}
 		std::cout << prompt;
@@ -154,6 +239,10 @@ bool System::deleteAccount(){
 	}
 	if(line.length() > 0 && line.compare("DELETE") == 0){
 		std::cout << "Deleting account, goodbye!\n";
+		if(users.find(currentUser) != users.end()){
+			users[currentUser].deleteUser();
+			Storage::storeUsers(users);
+		}
 		return true;
 	}
 	return false;
@@ -283,6 +372,7 @@ void System::mainMenu(){
 	/*
 		Handles display and navigation of the main menu
 	*/
+	clear();
 	std::string line = "";
 	std::string prompt = "Enter Selection: ";
 	while(line.length() < 1 || line[0] != '7'){
