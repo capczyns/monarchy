@@ -213,7 +213,7 @@ void System::viewUsers(){
 			++iter;
 		}
 		if(iter != users.end()){
-			prompt = "\nEnter to proceed: ";
+			prompt = "\nEnter to proceed (exit for main menu): ";
 		}
 		std::cout << prompt;
 		std::getline(std::cin, line);

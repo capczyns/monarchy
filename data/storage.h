@@ -8,6 +8,8 @@
 class Storage{
 private:
 	static std::string userFile;
+	static std::string separator;
+	static std::string storageDir;
 public:
 	static void storeUsers(std::map<std::string, User>& users);
 	static unsigned int fetchUsers(std::map<std::string, User>& users);
