@@ -1,4 +1,5 @@
 #include "ChrisHash.h"
+#include <iostream>
 namespace chrisLibs{
 	std::string binPrint(uint32_t num){
 		std::string out = "";
@@ -51,7 +52,7 @@ namespace chrisLibs{
 	uint32_t s1(const uint32_t& x){
 		return S(x, 17) ^ S(x, 19) ^ R(x, 10);
 	}
-	std::string sha256(std::string message){
+	std::string sha256(std::string& message){
 		uint32_t h0[] = {	//	Initial hash values...32 bit fractional part of square roots of first 8 primes
 			0x6a09e667,	0xbb67ae85,	0x3c6ef372,	0xa54ff53a,
 			0x510e527f,	0x9b05688c,	0x1f83D9ab,	0x5Be0cd19

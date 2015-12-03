@@ -15,6 +15,6 @@ namespace chrisLibs{
 	uint32_t S1(const uint32_t& x);
 	uint32_t s0(const uint32_t& x);
 	uint32_t s1(const uint32_t& x);
-	std::string sha256(std::string message);
+	std::string sha256(std::string& message);
 }
 #endif
