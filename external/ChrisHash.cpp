@@ -90,6 +90,9 @@ namespace chrisLibs{
 			zeroes = zeroes - length - 1;	//	Actual number of 0 bits we'll need
 		
 			M = new uint32_t[(length + zeroes + 65) / 32];
+			for(int index = 0; index < blocks * 16; ++index){
+				M[index] = 0;
+			}
 			size_t cIndex = 0;		//	Index of characters in message
 			size_t mIndex = 0;		//	Index of 32bit chunk in M
 			uint32_t myChar;		//	Used to cast chars into 32bits
