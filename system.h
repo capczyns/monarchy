@@ -18,6 +18,7 @@ private:
 	void reports();
 	void mainMenu();
 	void clear();
+	void editAccount();
 
 	std::map<std::string, User> users;
 	std::string pwdFile;

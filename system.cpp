@@ -8,30 +8,23 @@ void System::start(){
 		Starts the Butterfly Tracking System
 	*/
 	pwdFile = "pwdFile";
-	User::setNextId(Storage::fetchUsers(users) + 1);
+	Storage::fetchUsers(users);
 	loginMenu("");
 }
 bool System::createUser(){
 	std::string prompt = "User ID: ";
 	bool validInput = false;
-	std::string name, pwd, address, phone, tagId;
+	bool tagger;
+	std::string name, realName, pwd, address, city, state, zip, cellPhone, homePhone, organization, line;
 
 	while(!validInput){
 		clear();
 		std::cout << prompt;
 		std::getline(std::cin, name);
 		validInput = true;
-		for(int index = 0; index < name.length() && validInput; index++){
-			validInput = name[index] != ' ';
-		}
-		if(validInput){
-			validInput = (users.find(name) == users.end());
-			if(!validInput){
-				prompt = "User ID already exists\nUser ID: ";
-			}
-		}
-		else{
-			prompt = "Spaces not allowed\nUser ID: ";
+		validInput = (users.find(name) == users.end());
+		if(!validInput){
+			prompt = "User ID already exists\nUser ID: ";
 		}
 	}
 	std::cout << "Password: ";
@@ -39,16 +32,34 @@ bool System::createUser(){
 	std::getline(std::cin, pwd);
 	chrisLibs::echo(true);
 	pwd = chrisLibs::sha256(pwd);
-	std::cout << "\nAddress: ";
+	std::cout << "\nName: ";
+	std::getline(std::cin, realName);
+	std::cout << "Street Address: ";
 	std::getline(std::cin, address);
-	std::cout << "Phone: ";
-	std::getline(std::cin, phone);
-	std::cout << "Tagger ID (leave blank for none): ";
-	std::getline(std::cin, tagId);
-	if(tagId.size() < 1){
-		tagId = "NOT TAGGER";
+	std::cout << "City: ";
+	std::getline(std::cin, city);
+	std::cout << "State: ";
+	std::getline(std::cin, state);
+	std::cout << "Zip: ";
+	std::getline(std::cin, zip);
+	std::cout << "Cell Phone: ";
+	std::getline(std::cin, cellPhone);
+	std::cout << "Home Phone: ";
+	std::getline(std::cin, homePhone);
+	std::cout << "Organization: ";
+	std::getline(std::cin, organization);
+	std::cout << "Tagger (Y/YES for yes, anything else for no): ";
+	std::getline(std::cin, line);
+	if((line.length() == 1 && (line[0] == 'Y' || line[0] == 'y')) ||
+		(line.length() == 3 && (line[0] == 'Y' || line[0] == 'y') &&
+							   (line[1] == 'E' || line[1] == 'e') &&
+							   (line[2] == 'S' || line[2] == 's'))){
+		tagger = true;
 	}
-	users[name] = User(name, pwd, address, phone, tagId);
+	else{
+		tagger = false;
+	}
+	users[name] = User(name, pwd, realName, address, city, state, zip, cellPhone, homePhone, organization, tagger);
 	Storage::storeUsers(users);
 	loginMenu("Account Created");
 }
@@ -208,12 +219,12 @@ void System::viewUsers(){
 	size_t numUsers = users.size();
 	std::map<std::string, User>::iterator iter = users.begin();
 	while(iter != users.end() && line.compare("EXIT") != 0){
-		for(int index = 0; index < 10 && iter != users.end(); ++index){
+		for(int index = 0; index < 4 && iter != users.end(); ++index){
 			std::cout << iter->second << '\n';
 			++iter;
 		}
 		if(iter != users.end()){
-			prompt = "\nEnter to proceed: ";
+			prompt = "\nEnter to proceed (exit for main menu): ";
 		}
 		std::cout << prompt;
 		std::getline(std::cin, line);
@@ -368,6 +379,73 @@ void System::clear(){
 	*/
 	std::cout << std::string(100,'\n');
 }
+void System::editAccount(){
+	std::string line = "";
+	std::string realName = users[currentUser].getRealName();
+	std::string address = users[currentUser].getAddress();
+	std::string city = users[currentUser].getCity();
+	std::string state = users[currentUser].getState();
+	std::string zip = users[currentUser].getZip();
+	std::string homePhone = users[currentUser].getHomePhone();
+	std::string cellPhone = users[currentUser].getCellPhone();
+	std::string organization = users[currentUser].getOrganization();
+
+	bool tagger;
+	clear();
+	std::cout << "Name (Blank to use " + realName + "): ";
+	std::getline(std::cin, line);
+	if(line.length()> 0){
+		realName = line;
+	}
+	std::cout << "Street Address (Blank to use " + address + "): ";
+	std::getline(std::cin, line);
+	if(line.length() > 0){
+		address = line;
+	}
+	std::cout << "City (Blank to use " + city + "): ";
+	std::getline(std::cin, line);
+	if(line.length() > 0){
+		city = line;
+	}
+	std::cout << "State (Blank to use " + state + "): ";
+	std::getline(std::cin, line);
+	if(line.length() > 0){
+		state = line;
+	}
+	std::cout << "Zip (Blank to use " + zip + "): ";
+	std::getline(std::cin, line);
+	if(line.length() > 0){
+		zip = line;
+	}
+	std::cout << "Home Phone (Blank to use " + homePhone + "): ";
+	std::getline(std::cin, line);
+	if(line.length() > 0){
+		homePhone = line;
+	}
+	std::cout << "Cell Phone (Blank to use " + cellPhone + "): ";
+	std::getline(std::cin, line);
+	if(line.length() > 0){
+		cellPhone = line;
+	}
+	std::cout << "Organization (Blank to use " + organization + "): ";
+	std::getline(std::cin, line);
+	if(line.length() > 0){
+		organization = line;
+	}
+	std::cout << "Tagger (Y/YES for yes, anything else for no): ";
+	std::getline(std::cin, line);
+	if((line.length() == 1 && (line[0] == 'Y' || line[0] == 'y')) ||
+		(line.length() == 3 && (line[0] == 'Y' || line[0] == 'y') &&
+							   (line[1] == 'E' || line[1] == 'e') &&
+							   (line[2] == 'S' || line[2] == 's'))){
+		tagger = true;
+	}
+	else{
+		tagger = false;
+	}
+	users[currentUser].change(currentUser, realName, address, city, state, zip, homePhone, cellPhone, organization, tagger);
+	Storage::storeUsers(users);
+}
 void System::mainMenu(){
 	/*
 		Handles display and navigation of the main menu
@@ -375,7 +453,7 @@ void System::mainMenu(){
 	clear();
 	std::string line = "";
 	std::string prompt = "Enter Selection: ";
-	while(line.length() < 1 || line[0] != '7'){
+	while(line.length() < 1 || line[0] != '8'){
 		std::cout << "Main Menu:\n\n"
 				  << "1. View All Users\n"
 				  << "2. Manage Sightings\n"
@@ -383,11 +461,12 @@ void System::mainMenu(){
 				  << "4. Create Reports\n"
 				  << "5. Import/Export\n"
 				  << "6. Delete Account\n"
-				  << "7. Exit\n";
+				  << "7. Edit Account\n"
+				  << "8. Exit\n";
 		std::cout << '\n';
 		std::cout << prompt;
 		std::getline(std::cin, line);
-		if(line.length() < 1 || line[0] < '1' || line[0] > '7'){
+		if(line.length() < 1 || line[0] < '1' || line[0] > '8'){
 			prompt = "Invalid selection\nEnter Selection: ";
 			std::cout << std::string(100, '\n');
 		}
@@ -418,10 +497,13 @@ void System::mainMenu(){
 					}
 					break;
 				case '7':
+					editAccount();
+					prompt = "Account updated\n" + prompt;
+				case '8':
 					quit();
 					break;
 			};
-			if(line[0] != '7'){
+			if(line[0] != '8'){
 				clear();
 			}
 		}
