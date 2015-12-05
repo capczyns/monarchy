@@ -1,56 +1,76 @@
 #include "user.h"
 
-unsigned int User::nextId = 1;
 User::User(){
 	name = "EMPTY";
-	address = "EMPTY";
-	taggerId = "NOT TAGGER";
-	id = 0;
 	pwdHash = "EMPTY";
-	phone = "EMPTY";
+	realName = "EMPTY";
+	address = "EMPTY";
+	city = "EMPTY";
+	state = "EMPTY";
+	zip = "EMPTY";
+	cellPhone = "EMPTY";
+	homePhone = "EMPTY";
+	organization = "EMPTY";
+	tagger = false;
 }
-User::User(std::string name, std::string pwdHash, std::string address, std::string phone, std::string taggerId, unsigned int id){
+User::User(std::string name, std::string pwdHash, std::string realName, std::string address, std::string city, 
+		   std::string state, std::string zip, std::string cellPhone, std::string homePhone, std::string organization, bool tagger){
 	this->name = name;
-	this->address = address;
-	this->taggerId = taggerId;
 	this->pwdHash = pwdHash;
-	this->phone = phone;
-	if(id == 0){
-		this->id = nextId++;
-	}
-	else{
-		this->id = id;
-	}
+	this->realName = realName;
+	this->address = address;
+	this->city = city;
+	this->state = state;
+	this->zip = zip;
+	this->cellPhone = cellPhone;
+	this->homePhone = homePhone;
+	this->organization = organization;
+	this->tagger = tagger;
+}
+void User::change(std::string name, std::string realName, std::string address, std::string city,
+				  std::string state, std::string zip, std::string cellPhone, std::string homePhone, std::string organization, bool tagger){
+	this->name = name;
+	this->realName = realName;
+	this->address = address;
+	this->city = city;
+	this->state = state;
+	this->zip = zip;
+	this->cellPhone = cellPhone;
+	this->homePhone = homePhone;
+	this->organization = organization;
+	this->tagger = tagger;
 }
 std::string User::getName(){
 	return name;
 }
+std::string User::getRealName(){
+	return realName;
+}
 std::string User::getAddress(){
 	return address;
 }
-unsigned int User::getId(){
-	return id;
+std::string User::getCity(){
+	return city;
 }
-std::string User::getTaggerId(){
-	return taggerId;
+std::string User::getState(){
+	return state;
+}
+std::string User::getZip(){
+	return zip;
+}
+std::string User::getCellPhone(){
+	return cellPhone;
+}
+std::string User::getHomePhone(){
+	return homePhone;
+}
+std::string User::getOrganization(){
+	return organization;
 }
 std::ostream& operator<<(std::ostream& out, const User& user){
-	std::string strOut = "";
-	if(user.name.length() > 15){
-		strOut += user.name.substr(0, 12) + "...";
-	}
-	else{
-		strOut += user.name + std::string(15 - user.name.length(), ' ');
-	}
-	strOut += '\t';
-	if(user.address.length() > 20){
-		strOut += user.address.substr(0,17) + "...";
-	}
-	else{
-		strOut += user.address + std::string(20-user.address.length(), ' ');
-	}
-	strOut += '\t' + user.phone + '\t' + user.taggerId;
-	out << strOut;
+	out <<"Username: " << user.name << "     Name: " << user.realName << "     Organization: " << user.organization << std::endl;
+	out << "Address: " << user.address << ", " << user.city << ", " << user.state << " " << user.zip << std::endl;
+	out << "Cell #: " << user.cellPhone << "     Home #: " << user.homePhone << std::endl;
 	return out;
 }
 bool User::canLogin(){
@@ -59,22 +79,32 @@ bool User::canLogin(){
 void User::deleteUser(){
 	exists = false;
 }
-void User::setNextId(unsigned int id){
-	nextId = id;
-}
 bool User::checkHash(std::string inHash){
 	return (pwdHash.compare(inHash) == 0);
 }
 void User::saveStr(std::ostream& out){
-	out << address << std::endl
-		<< phone << std::endl
-		<< taggerId << std::endl
-		<< name << " " << pwdHash << " " << id;
+	out << name << std::endl;
+	out << address << std::endl;
+	out << city << std::endl;
+	out << state << std::endl;
+	out << zip << std::endl;
+	out << realName << std::endl;
+	out << homePhone << std::endl;
+	out << cellPhone << std::endl;
+	out << organization << std::endl;
+	out << pwdHash << std::endl;
 	if(exists){
-		out << " T";
+		out << "T";
 	}
 	else{
-		out << " F";
+		out << "F";
+	}
+	out << std::endl;
+	if(tagger){
+		out << "T";
+	}
+	else{
+		out << "F";
 	}
 	out << std::endl;
 }

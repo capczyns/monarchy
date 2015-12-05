@@ -16,21 +16,6 @@ void Storage::storeUsers(std::map<std::string, User>& users){
 	if(outFile.is_open()){
 		for(std::map<std::string, User>::iterator i = users.begin(); i != users.end(); ++i){
 			i->second.saveStr(outFile);
-
-
-			/*
-				unsigned int id;
-				unsigned int taggerId;
-				std::string name;
-				std::string address;
-				std::string pwdHash;
-				bool exists = true;
-
-	return address + '\n' + name + ' ' + pwdHash + ' ' + id + ' ' + taggerId + ' ' + exists;
-
-	User(std::string name, std::string pwdHash, std::string address, unsigned int taggerId=0, unsigned int id = 0);
-				
-			*/
 		}
 		outFile.close();
 	}
@@ -38,42 +23,54 @@ void Storage::storeUsers(std::map<std::string, User>& users){
 		std::cout << "Didn't open outFile";
 	}
 }
-unsigned int Storage::fetchUsers(std::map<std::string, User>& users){
-	unsigned int id;
-	std::string taggerId;
+void Storage::fetchUsers(std::map<std::string, User>& users){
 	std::string name;
 	std::string address;
+	std::string city;
+	std::string state;
+	std::string zip;
+	std::string realName;
+	std::string homePhone;
+	std::string cellPhone;
+	std::string organization;
 	std::string pwdHash;
-	std::string phone;
-	std::string existChar;
-	std::string idStr;
+	std::string existStr;
+	std::string taggerStr;
 	bool exists;
+	bool tagger;
 
-	unsigned int highestId = 1;
 	std::ifstream inFile(storageDir + separator + userFile);
 	if(inFile.is_open()){
-		while(std::getline(inFile, address)){
-			if(address.length() > 0){
-				std::getline(inFile, phone);
-				std::getline(inFile, taggerId);
-				inFile >> name >> pwdHash >> id >> existChar;
-				if(existChar[0] == 'T'){
+		while(std::getline(inFile, name)){
+			if(name.length() > 0){
+				std::getline(inFile, address);
+				std::getline(inFile, city);
+				std::getline(inFile, state);
+				std::getline(inFile, zip);
+				std::getline(inFile, realName);
+				std::getline(inFile, homePhone);
+				std::getline(inFile, cellPhone);
+				std::getline(inFile, organization);
+				std::getline(inFile, pwdHash);
+				std::getline(inFile, existStr);
+				std::getline(inFile, taggerStr);
+				if(existStr[0] == 'T'){
 					exists = true;
 				}
 				else{
 					exists = false;
 				}
-				User tmp(name, pwdHash, address, phone, taggerId, id);
-				users[name] = tmp;
+				if(taggerStr[0] == 'T'){
+					tagger = true;
+				}
+				else{
+					tagger = false;
+				}
+				users[name] = User(name, pwdHash, realName, address, city, state, zip, cellPhone, homePhone, organization, tagger);
 				if(!exists){
 					users[name].deleteUser();
 				}
-				if(id > highestId){
-					highestId = id;
-				}
-				inFile.ignore(10, '\n');	//	Clears leftover newline
 			}
 		}
 	}
-	return highestId;
 }

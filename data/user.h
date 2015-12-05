@@ -4,25 +4,36 @@
 #include <iostream>
 class User{
 private:
-	unsigned int id;
-	std::string taggerId;
 	std::string name;
-	std::string address;
-	std::string phone;
-	bool exists = true;
-	static unsigned int nextId;
-public:
 	std::string pwdHash;
+	std::string realName;
+	std::string address;
+	std::string city;
+	std::string state;
+	std::string zip;
+	std::string cellPhone;
+	std::string homePhone;
+	std::string organization;
+	bool tagger;
+
+	bool exists = true;	//	Handles 'delete'...if an account is deleted, the use shouldn't be able to log on anymore, but user still needs to be in database
+public:
 	User();
-	User(std::string name, std::string pwdHash, std::string address, std::string phone, std::string taggerId=0, unsigned int id = 0);
-	User(std::string name, std::string address, std::string phone, std::string taggerId="NOT TAGGER", unsigned int id = 0) : User(name, ".", address, taggerId, id){}
+	User(std::string name, std::string pwdHash, std::string realName, std::string address, std::string city, std::string state, 
+		 std::string zip, std::string cellPhone, std::string homePhone, std::string organization, bool tagger = false);
 	std::string getName();
+	std::string getRealName();
 	std::string getAddress();
-	unsigned int getId();
-	std::string getTaggerId();
+	std::string getCity();
+	std::string getState();
+	std::string getZip();
+	std::string getCellPhone();
+	std::string getHomePhone();
+	std::string getOrganization();
+	void change(std::string name, std::string realName, std::string address, std::string city,
+				std::string state, std::string zip, std::string cellPhone, std::string homePhone, std::string organization, bool tagger);
 	void deleteUser();
 	bool canLogin();
-	static void setNextId(unsigned int id);
 	void saveStr(std::ostream& out);
 	bool checkHash(std::string inHash);
 	friend std::ostream& operator<<(std::ostream& out, const User& user);

@@ -12,6 +12,6 @@ private:
 	static std::string storageDir;
 public:
 	static void storeUsers(std::map<std::string, User>& users);
-	static unsigned int fetchUsers(std::map<std::string, User>& users);
+	static void fetchUsers(std::map<std::string, User>& users);
 };
 #endif
