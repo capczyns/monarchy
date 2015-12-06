@@ -127,6 +127,39 @@ void Sighting::saveStr(std::ostream& out){
 	out << country << std::endl;
 	out << tagNum << std::endl;
 }
+std::string SightingData::dateStr(){
+	std::stringstream ss;
+	ss << std::setfill('0') << std::setw(4) << year << '-' << std::setw(2) << month << '-' << std::setw(2) << day;
+	return ss.str();
+}
+std::string SightingData::cityStr(){
+	char cityStr[90];
+	for(int index = 0; index < 30; ++index){
+		if(index < city.length()){
+			cityStr[index] = city[index];
+		}
+		else{
+			cityStr[index] = ' ';
+		}
+	}
+	for(int index = 0; index < 30; ++index){
+		if(index < city.length()){
+			cityStr[index+30] = city[index];
+		}
+		else{
+			cityStr[index+30] = ' ';
+		}
+	}
+	for(int index = 0; index < 30; ++index){
+		if(index < city.length()){
+			cityStr[index+60] = city[index];
+		}
+		else{
+			cityStr[index+60] = ' ';
+		}
+	}
+	return std::string(cityStr);
+}
 std::ostream& operator<<(std::ostream& out, const Sighting& sighting){
 	out << "Sighting ID: " << sighting.id << "     Reporter: " << sighting.reporter << "     Date: "
 		<< std::setfill('0') << std::setw(2)

@@ -10,6 +10,48 @@ std::string Storage::separator = "/";
 std::string Storage::storageDir = "storage";
 std::string Storage::userFile = "Users.txt";
 std::string Storage::sightingFile = "Sightings.txt";
+std::string Storage::tagFile = "Tags.txt";
+
+
+void Storage::storeTags(std::map<std::string, Butterfly>& tags){
+	std::ofstream outFile;
+	outFile.open(storageDir + separator + tagFile), std::ofstream::trunc;
+	if(outFile.is_open()){
+		for(std::map<std::string, Butterfly>::iterator iter = tags.begin(); iter != tags.end(); ++iter){
+			iter->second.saveStr(outFile);
+		}
+	}
+}
+void Storage::saveTag(Butterfly& tag){
+	std::ofstream outFile;
+	outFile.open(storageDir + separator + tagFile, std::ofstream::app);
+	if(outFile.is_open()){
+		tag.saveStr(outFile);
+		outFile.close();
+	}
+}
+void Storage::fetchTags(std::map<std::string, Butterfly>& tags){
+	std::string line;
+
+	std::ifstream inFile(storageDir + separator + tagFile);
+	ButterflyData data;
+	std::stringstream ss;
+	Sighting* addr;
+	if(inFile.is_open()){
+		while(std::getline(inFile, data.tagger)){
+			if(data.tagger.length() > 0){
+				std::getline(inFile, data.tagNum);
+				std::getline(inFile, data.species);
+				std::getline(inFile, data.city);
+				std::getline(inFile, data.state);
+				std::getline(inFile, data.country);
+				inFile >> data.day >> data.month >> data.year >> data.hour >> data.minute >> data.second >> data.latitude >> data.longitude;
+				tags[data.tagNum] = Butterfly(data);
+				inFile.ignore(10, '\n');
+			}
+		}
+	}
+}
 void Storage::saveSighting(Sighting& sighting){
 	std::ofstream outFile;
 	outFile.open(storageDir + separator + sightingFile, std::ofstream::app);
@@ -38,12 +80,17 @@ void Storage::storeSightings(std::map<unsigned int, Sighting>& sightings){
 	else{
 	}
 }
-void Storage::fetchSightings(std::map<unsigned int, Sighting>& sightings){
+void Storage::fetchSightings(std::map<unsigned int, Sighting>& sightings,
+							 std::map<std::string, std::vector<Sighting*> >& tagSightings,
+							 std::map<std::string, std::vector<Sighting*> >& dateSightings,
+							 std::map<std::string, std::vector<Sighting*> >& locationSightings,
+							 std::map<std::string, std::vector<Sighting*> >& userSightings){
 	std::string line;
 
 	std::ifstream inFile(storageDir + separator + sightingFile);
 	SightingData data;
 	std::stringstream ss;
+	Sighting* addr;
 	if(inFile.is_open()){
 		while(std::getline(inFile, data.species)){
 			if(data.species.length() > 0){
@@ -55,21 +102,11 @@ void Storage::fetchSightings(std::map<unsigned int, Sighting>& sightings){
 				std::getline(inFile, data.country);
 				std::getline(inFile, data.tagNum);
 				sightings[data.id] = Sighting(data);
-				std::cerr << "species = " <<data.species << std::endl;
-				std::cerr << "id = " <<data.id << std::endl;
-				std::cerr << "year = " <<data.year << std::endl;
-				std::cerr << "month = " <<data.month << std::endl;
-				std::cerr << "day = " <<data.day << std::endl;
-				std::cerr << "hour = " <<data.hour << std::endl;
-				std::cerr << "minute = " <<data.minute << std::endl;
-				std::cerr << "second = " <<data.second << std::endl;
-				std::cerr << "latitude = " <<data.latitude << std::endl;
-				std::cerr << "longitude = " <<data.longitude << std::endl;
-				std::cerr << "reporter = " <<data.reporter << std::endl;
-				std::cerr << "city = " <<data.city << std::endl;
-				std::cerr << "state = " <<data.state << std::endl;
-				std::cerr << "species = " <<data.species << std::endl;
-				std::cerr << "tagNum = " <<data.tagNum << std::endl;
+				addr = &sightings[data.id];
+				tagSightings[data.tagNum].push_back(addr);
+				dateSightings[data.tagNum].push_back(addr);
+				locationSightings[data.tagNum].push_back(addr);
+				userSightings[data.reporter].push_back(addr);
 			}
 		}
 	}

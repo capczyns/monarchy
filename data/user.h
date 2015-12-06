@@ -36,6 +36,7 @@ public:
 	bool canLogin();
 	void saveStr(std::ostream& out);
 	bool checkHash(std::string inHash);
+	bool canTag();
 	friend std::ostream& operator<<(std::ostream& out, const User& user);
 };
 #endif
