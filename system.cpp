@@ -60,7 +60,7 @@ bool System::createUser(){
 		tagger = false;
 	}
 	users[name] = User(name, pwd, realName, address, city, state, zip, cellPhone, homePhone, organization, tagger);
-	Storage::storeUsers(users);
+	Storage::saveUser(users[name]);
 	loginMenu("Account Created");
 }
 void System::loginMenu(std::string message){
@@ -116,6 +116,7 @@ void System::login(std::string message){
 			Log in the user
 		*/
 		currentUser = name;
+		Storage::fetchSightings(sightings);
 		mainMenu();
 	}
 	else{
@@ -168,44 +169,599 @@ std::string System::importExport(){
 	}
 	return "File operation cancelled.";
 }
+std::string System::editSighting(Sighting& sighting){
+	/*
+		Handles creating a sighting
+	*/
+	clear();
+	bool validInput = false;
+	bool cancelled = false;
+	std::string line, temp;
+	SightingData data = sighting.getData();
+	std::string prompt;
+	std::cout << sighting << "\n\n";
+	std::cout << "Enter sighting data, or \"exit\" to cancel.\nLeave blank to use original value\n\n";
+
+	std::string date;
+	std::stringstream ss;
+	ss << std::setfill('0') << std::setw(4) << data.year << '-' << std::setw(2) << data.month << '-' << std::setw(2) << data.day;
+	date = ss.str();
+	ss.str(std::string());
+
+	ss << std::setfill('0') << std::setw(2) << data.hour << ':' << std::setw(2) << data.minute << ':' << std::setw(2) << data.second;
+	std::string sightTime = ss.str();
+	ss.str(std::string());
+
+	prompt = "Date (Blank to use " + date + ") : ";
+	while(!validInput && !cancelled){	//	Entering Latitude
+		validInput = true;
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting Update cancelled!";
+		}
+		else if(line.length() == 0){
+			validInput = true;
+		}
+		else if(line.length() == 10){
+			temp = "";
+			for(int index = 0; validInput && index < 4; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+					validInput = true;
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput)
+				data.year = std::stoi(temp);
+			temp = "";
+			for(int index = 5; validInput && index < 7; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+					validInput = true;
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput){
+				data.month = std::stoi(temp);
+			}
+			temp = "";
+			for(int index = 8; validInput && index < 10; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+					validInput = true;
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput){
+				if(!(validInput = data.month > 0 && data.month <= 12)){
+					prompt = "Month must be between 1 and 12\nDate (YYYY-MM-DD): ";
+				}
+				data.day = std::stoi(temp);
+				if(data.day < 1 || data.day > 31){
+					prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
+					validInput = false;
+				}
+				else{
+					if(data.month == 2){
+						if(data.day > 29){
+							validInput = false;
+							prompt = "Wrong number of days (February)\nDate (YYYY-MM-DD): ";
+						}
+						if(data.year % 4 == 0 && data.day > 28){
+							validInput = false;
+							prompt = "Wrong number of days (February in Leap Year)\nDate (YYYY-MM-DD): ";
+						}
+					}
+					else if((data.month == 4 || data.month == 6 || data.month == 9 ||
+							 data.month == 11) && data.day > 30){
+						validInput = false;
+						prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
+					}
+				}
+			}
+			else{
+				prompt = "Please use correct format (YYYY-MM-DD): ";
+				validInput = false;
+			}
+		}
+		else{
+			validInput = false;
+			prompt = "Please use correct format (YYYY-MM-DD): ";
+		}
+	}
+	prompt = "Time (Blank to use " + sightTime + ") : ";
+	validInput = false;
+	while(!validInput && !cancelled){	//	Entering Latitude
+		validInput = true;
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting Update cancelled!";
+		}
+		else if(line.length() == 0){
+			validInput = true;
+		}
+		else if(line.length() == 8){
+			temp = "";
+			for(int index = 0; validInput && index < 2; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput)
+				data.hour = std::stoi(temp);
+			temp = "";
+			for(int index = 3; validInput && index < 5; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput){
+				data.minute = std::stoi(temp);
+			}
+			temp = "";
+			for(int index = 6; validInput && index < 8; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput){
+				data.second = std::stoi(temp);
+				if(data.hour < 0 || data.hour > 24){
+					validInput = false;
+					prompt = "Hour must be between 0 and 24\nTime (HH:MM:SS): ";
+				}
+				if(data.minute < 0 || data.minute > 60 ||
+				   data.second < 0 || data.second > 60){
+					validInput = false;
+					prompt = "Minutes and Seconds must be between 0 and 60\nTime (HH:MM:SS): ";
+				}
+			}
+			else{
+				prompt = "Please use correct format (HH:MM:SS): ";
+				validInput = false;
+			}
+		}
+		else{
+			prompt = "Please use correct format (HH:MM:SS): ";
+			validInput = false;
+		}
+	}
+	temp = "";
+	if(data.latitude > 0){
+		temp = "+";
+	}
+	temp += std::to_string(data.latitude);
+	prompt = "Latitude (Blank to use " + temp + "): ";
+	validInput = false;
+	while(!validInput && !cancelled){	//	Entering Latitude
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting update cancelled!";
+		}
+		else if(line.length() > 0){
+			ss.str(line);
+			ss.seekg(0);
+			ss.clear();
+			validInput = ss >> data.latitude;
+			if(validInput){
+				validInput = data.latitude >= -90 && data.latitude <= 90;
+			}
+			prompt = "Invalid Latitude, Please try again: ";
+		}
+		else{
+			validInput = true;
+		}
+	}
+	validInput = false;
+	temp = "";
+	if(data.longitude > 0){
+		temp = "+";
+	}
+	temp += std::to_string(data.longitude);
+	prompt = "Longitude (Blank to use " + temp + "): ";
+	while(!validInput && !cancelled){	//	Entering Longitude
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting update cancelled!";
+		}
+		else if(line.length() > 0){
+			ss.str(line);
+			ss.seekg(0);
+			ss.clear();
+			validInput = ss >> data.longitude;
+			if(validInput){
+				validInput = data.longitude >= -180 && data.longitude <= 180;
+			}
+			prompt = "Invalid Longitude, Please try again: ";
+		}
+		else{
+			validInput = true;
+		}
+	}
+	validInput = false;
+	std::cout << "City (Blank to use " + data.city + "): ";
+	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return "Sighting update cancelled!";
+	}
+	else if(line.length() > 0){
+		data.city = line;
+	}
+	std::cout << "State/Province (Blank to use " + data.state + "): ";
+	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return "Sighting update cancelled!";
+	}
+	else if(line.length() > 0){
+		data.state = line;
+	}
+	std::cout << "Country (Blank to use " + data.country + "): ";
+	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return "Sighting update cancelled!";
+	}
+	else{
+		data.country = line;
+	}
+	prompt = "Species (Blank to use " + data.species + "): ";
+	while(!validInput && !cancelled){	//	Entering Longitude
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting update cancelled!";
+		}
+		else if(line.length() > 0){
+			data.species = line;
+			prompt = "Species cannot be blank, please try again: ";
+		}
+		else{
+			validInput = true;
+		}
+	}
+	validInput = false;
+	if(data.tagNum.length() > 0){
+		prompt = "Tag Number (Blank to use " + data.tagNum + "): ";
+	}
+	else{
+		prompt = "Tag Number (Blank for none): ";
+	}
+	while(!validInput && !cancelled){	//	Entering Longitude
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting update cancelled!";
+		}
+		else if(line.length() > 0){
+			validInput = true;	//	TODO: Change this when we have tag database
+			data.tagNum = line;
+			prompt = "Tag number exists for another species already, Try another: ";
+		}
+		else{
+			validInput = true;
+		}
+	}
+	if(cancelled){
+		return "Sighting update cancelled!";
+	}
+	sightings[data.id].update(data);
+	//	Save sightings (only end of file?)
+	Storage::storeSightings(sightings);
+	return "Sighting updated, ID = " + std::to_string(data.id);
+}
 std::string System::createSighting(){
 	/*
 		Handles creating a sighting
 	*/
 	clear();
-	std::string line = "";
-	std::string prompt = "\nSelect Sighting Type: ";
-	std::cout << "Sightings Menu:\n\n"
-			  << "1. Tagged\n"
-			  << "2. Untagged\n"
-			  << "3. Cancel\n";
-	std::cout << prompt;
-	std::getline(std::cin, line);
-	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
-		clear();
-		prompt = "\nUnknown command\nSelect Sighting Type: ";
-		std::cout << "\n\n\n";
-		std::cout << "Sightings Menu:\n\n"
-				  << "1. Tagged\n"
-				  << "2. Untagged\n"
-				  << "3. Cancel\n";
+	bool validInput = false;
+	bool cancelled = false;
+	std::string line, temp;
+	SightingData data;
+	std::stringstream ss;
+	std::string prompt;
+
+	std::cout << "Enter sighting data, or \"exit\" to cancel.\n\n";
+
+	prompt = "Date (YYYY-MM-DD): ";
+	while(!validInput && !cancelled){	//	Entering Latitude
+		validInput = true;
 		std::cout << prompt;
 		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting creation cancelled!";
+		}
+		else if(line.length() == 10){
+			temp = "";
+			for(int index = 0; validInput && index < 4; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+					validInput = true;
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput)
+				data.year = std::stoi(temp);
+			temp = "";
+			for(int index = 5; validInput && index < 7; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+					validInput = true;
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput){
+				data.month = std::stoi(temp);
+			}
+			temp = "";
+			for(int index = 8; validInput && index < 10; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+					validInput = true;
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput){
+				if(!(validInput = data.month > 0 && data.month <= 12)){
+					prompt = "Month must be between 1 and 12\nDate (YYYY-MM-DD): ";
+				}
+				data.day = std::stoi(temp);
+				if(data.day < 1 || data.day > 31){
+					prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
+					validInput = false;
+				}
+				else{
+					if(data.month == 2){
+						if(data.day > 29){
+							validInput = false;
+							prompt = "Wrong number of days (February)\nDate (YYYY-MM-DD): ";
+						}
+						if(data.year % 4 == 0 && data.day > 28){
+							validInput = false;
+							prompt = "Wrong number of days (February in Leap Year)\nDate (YYYY-MM-DD): ";
+						}
+					}
+					else if((data.month == 4 || data.month == 6 || data.month == 9 ||
+							 data.month == 11) && data.day > 30){
+						validInput = false;
+						prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
+					}
+				}
+			}
+			else{
+				prompt = "Please use correct format (YYYY-MM-DD): ";
+				validInput = false;
+			}
+		}
+		else{
+			validInput = false;
+			prompt = "Please use correct format (YYYY-MM-DD): ";
+		}
 	}
-	switch(line[0]){
-		case '1':
-			std::cout << "Enter Tagged Sighting stuff";
-			std::getline(std::cin, line);
-			break;
-		case '2':
-			std::cout << "Enter Untagged Sighting stuff";
-			std::getline(std::cin, line);
-			break;
-		default:
-			return "Sighting creation cancelled.";
-			break;
-	};
-	return "Sighting created, ID = _____.";
+	prompt = "Time (HH:MM:SS): ";
+	validInput = false;
+	while(!validInput && !cancelled){	//	Entering Latitude
+		validInput = true;
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting creation cancelled!";
+		}
+		else if(line.length() == 8){
+			temp = "";
+			for(int index = 0; validInput && index < 2; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput)
+				data.hour = std::stoi(temp);
+			temp = "";
+			for(int index = 3; validInput && index < 5; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput){
+				data.minute = std::stoi(temp);
+			}
+			temp = "";
+			for(int index = 6; validInput && index < 8; ++index){
+				if(line[index] >= '0' && line[index] <= '9'){
+					temp += line[index];
+				}
+				else{
+					validInput = false;
+				}
+			}
+			if(validInput){
+				data.second = std::stoi(temp);
+				if(data.hour < 0 || data.hour > 24){
+					validInput = false;
+					prompt = "Hour must be between 0 and 24\nTime (HH:MM:SS): ";
+				}
+				if(data.minute < 0 || data.minute > 60 ||
+				   data.second < 0 || data.second > 60){
+					validInput = false;
+					prompt = "Minutes and Seconds must be between 0 and 60\nTime (HH:MM:SS): ";
+				}
+			}
+			else{
+				prompt = "Please use correct format (HH:MM:SS): ";
+				validInput = false;
+			}
+		}
+		else{
+			prompt = "Please use correct format (HH:MM:SS): ";
+			validInput = false;
+		}
+	}
+	prompt = "Latitude: ";
+	validInput = false;
+	while(!validInput && !cancelled){	//	Entering Latitude
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting creation cancelled!";
+		}
+		else{
+			ss.str(line);
+			ss.seekg(0);
+			ss.clear();
+			validInput = ss >> data.latitude;
+			if(validInput){
+				validInput = data.latitude >= -90 && data.latitude <= 90;
+			}
+			prompt = "Invalid Latitude, Please try again: ";
+		}
+	}
+	validInput = false;
+	prompt = "Longitude: ";
+	while(!validInput && !cancelled){	//	Entering Longitude
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting creation cancelled!";
+		}
+		else{
+			ss.str(line);
+			ss.seekg(0);
+			ss.clear();
+			validInput = ss >> data.longitude;
+			if(validInput){
+				validInput = data.longitude >= -180 && data.longitude <= 180;
+			}
+			prompt = "Invalid Longitude, Please try again: ";
+		}
+	}
+	validInput = false;
+	std::cout << "City: ";
+	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return "Sighting creation cancelled!";
+	}
+	else{
+		data.city = line;
+	}
+	std::cout << "State/Province: ";
+	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return "Sighting creation cancelled!";
+	}
+	else{
+		data.state = line;
+	}
+	std::cout << "Country: ";
+	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return "Sighting creation cancelled!";
+	}
+	else{
+		data.country = line;
+	}
+	prompt = "Species: ";
+	while(!validInput && !cancelled){	//	Entering Longitude
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting creation cancelled!";
+		}
+		else{
+			validInput = line.length() > 0;
+			data.species = line;
+			prompt = "Species cannot be blank, please try again: ";
+		}
+	}
+	validInput = false;
+	prompt = "Tag Number (Blank for none): ";
+	while(!validInput && !cancelled){	//	Entering Longitude
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "Sighting creation cancelled!";
+		}
+		else{
+			validInput = true;	//	Change this when we have tag database
+			data.tagNum = line;
+			prompt = "Tag number exists for another species already, Try another: ";
+		}
+	}
+	if(cancelled){
+		return "Sighting creation cancelled!";
+	}
+	Sighting tmp(currentUser, data.year, data.month, data.day, data.hour, data.minute, data.second,
+				 data.latitude, data.longitude, data.city, data.state, data.country, data.species, data.tagNum);
+	data = tmp.getData();
+	sightings[tmp.getId()] = Sighting(data);
+	//	Save sightings (only end of file?)
+	Storage::saveSighting(sightings[data.id]);
+	return "Sighting created, ID = " + std::to_string(data.id);
 }
 void System::viewUsers(){
 	/*
@@ -258,23 +814,48 @@ bool System::deleteAccount(){
 	}
 	return false;
 }
-std::string System::manageSightings(){
+std::string System::manageSightings(std::string message, unsigned int id){
 	/*
 		Handles managing sightings
 	*/
 	clear();
 	std::string line = "";
-	std::string sightID = "";
-	std::cout << "Enter Sighting ID: ";
-	std::getline(std::cin, sightID);
-	std::string prompt = "\nChoose option: ";
-	std::string title;
+	std::string prompt = "\nEnter Sighting ID or \"exit\" to cancel: ";
+	bool validInput = false;
 	bool cancelled = false;
 	bool deleted = false;
+	std::stringstream ss;
+	std::map<unsigned int, Sighting>::iterator iter;
+	if(message.length() == 0){
+		while(!validInput && !cancelled){
+			clear();
+			std::cout << prompt;
+			std::getline(std::cin, line);
+			if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+				(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+				(line[3] == 't' || line[3] == 'T')){
+				return "Sighting management cancelled!";
+			}
+			else{
+				ss.str(line);
+				ss.seekg(0);
+				ss.clear();
+				validInput = (ss >> id);
+				prompt = "Error parsing Sighting ID\nEnter Sighting ID or \"exit\" to cancel: ";
+				if(validInput){
+					iter = sightings.find(id);
+					validInput = (iter != sightings.end());
+					prompt = "Sighting ID not found\nEnter Sighting ID or \"exit\" to cancel: ";
+				}
+			}
+		}
+	}
+	prompt = message + "\nChoose option: ";
+	line = "";
 	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
 		clear();
-		std::cout << "Sighting ID: " << sightID << '\n'
-				  << "Manage Sightings Menu:\n"
+		std::cout << iter->second;
+		std::cout << "\n\nManage Sightings Menu:\n"
 				  << "1. Update\n"
 				  << "2. Delete\n"
 				  << "3. Cancel\n";
@@ -284,48 +865,42 @@ std::string System::manageSightings(){
 	}
 	switch(line[0]){
 		case '1':
-			title = "Sighting ID: " + sightID + "\nUpdate Sighting Menu:\n";
+			if(currentUser.compare(iter->second.getReporter()) == 0){
+				return editSighting(iter->second);
+			}
+			else{
+				return "Cannot modify sightings by other users.";
+			}
 			break;
 		case '2':
-			title = "Sighting ID: " + sightID + "\nDelete Sighting Menu:\n";
-			deleted = true;
+			if(currentUser.compare(iter->second.getReporter()) == 0){
+				deleted = true;
+			}
+			else{
+				return "Cannot delete sightings by other users.";
+			}
 			break;
 		default:
 			cancelled = true;
 	};
 	if(deleted){
-		return "Sighting " + sightID + " Deleted.";
+		std::cout << "Are you sure you want to delete this sighting (Y/Yes): ";
+		std::getline(std::cin, line);
+		if(line[0] == 'y' || line[0] == 'Y'){
+			sightings.erase(id);
+			Storage::storeSightings(sightings);
+			return "Sighting " + std::to_string(id) + " Deleted.";
+		}
+		else{
+			return "Delete Aborted";
+		}
 	}
 	if(cancelled){
-		return "Sighting " + sightID + " update cancelled.";
+		return "Sighting " + std::to_string(id) + " update cancelled.";
 	}
 	else{
-		line = "";
-		prompt = "\nChoose option: ";
-		while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
-			clear();
-			std::cout << title
-					  << "1. Tagged\n"
-					  << "2. Untagged\n"
-					  << "3. Cancel\n";
-			std::cout << prompt;
-			std::getline(std::cin, line);
-			prompt = "\nInvalid option\nChoose option: ";
-		}
-		switch(line[0]){
-			case '1':
-				std::cout << "Tagged Sighting Information Input";
-				std::getline(std::cin, line);
-				break;
-			case '2':
-				std::cout << "Untagged Sighting Information Input ";
-				std::getline(std::cin, line);
-				break;
-			case '3':
-				return "Sighting " + sightID + " update cancelled!";
-		};
 	}
-	return "Sighting " + sightID + " update successful!";
+	return "Sighting " + std::to_string(id) + " update successful!";
 
 }
 void System::reports(){
