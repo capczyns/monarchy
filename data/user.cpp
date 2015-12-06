@@ -108,6 +108,9 @@ void User::saveStr(std::ostream& out){
 	}
 	out << std::endl;
 }
+bool User::canTag(){
+	return tagger;
+}
 /*
 	unsigned int id;
 	unsigned int taggerId;

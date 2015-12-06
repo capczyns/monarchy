@@ -3,6 +3,7 @@
 #include <string>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 struct SightingData{
 public:
 	unsigned int id;
@@ -24,6 +25,8 @@ public:
 			 int hour, int minute, int second, double latitude, double longitude,
 			 std::string city, std::string state, std::string country, std::string species, std::string tagNum, unsigned int id);
 	SightingData() : SightingData("", 0, 0, 0, 0, 0, 0, 0.0, 0.0, "", "", "", "", "", 0){}
+	std::string dateStr();
+	std::string cityStr();
 };
 class Sighting{
 private:

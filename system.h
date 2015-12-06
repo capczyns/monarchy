@@ -4,9 +4,11 @@
 #include <sstream>
 #include <iomanip>
 #include <map>
+#include <vector>
 #include "data/user.h"
 #include "data/storage.h"
 #include "data/sighting.h"
+#include "data/butterfly.h"
 class System{
 private:
 	bool createUser();
@@ -26,7 +28,11 @@ private:
 
 	std::map<std::string, User> users;
 	std::map<unsigned int, Sighting> sightings;
-	std::string pwdFile;
+	std::map<std::string, Butterfly> tags;
+	std::map<std::string, std::vector<Sighting*> > userSightings;
+	std::map<std::string, std::vector<Sighting*> > tagSightings;
+	std::map<std::string, std::vector<Sighting*> > locationSightings;
+	std::map<std::string, std::vector<Sighting*> > dateSightings;
 	std::string currentUser;
 public:
 	void start();

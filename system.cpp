@@ -7,7 +7,6 @@ void System::start(){
 	/*
 		Starts the Butterfly Tracking System
 	*/
-	pwdFile = "pwdFile";
 	Storage::fetchUsers(users);
 	loginMenu("");
 }
@@ -100,10 +99,6 @@ void System::login(std::string message){
 		std::cout << prompt;
 		std::getline(std::cin, name);
 		validName = true;
-		for(size_t index = 0; validName && index < name.length(); index++){
-			validName = name[index] != ' ';
-		}
-		prompt = "Invalid name, spaces not allowed\nUsername: ";
 	}
 	std::cout << "Password: ";
 	chrisLibs::echo(false);
@@ -116,7 +111,8 @@ void System::login(std::string message){
 			Log in the user
 		*/
 		currentUser = name;
-		Storage::fetchSightings(sightings);
+		Storage::fetchSightings(sightings, tagSightings, dateSightings, locationSightings, userSightings);
+		Storage::fetchTags(tags);
 		mainMenu();
 	}
 	else{
@@ -178,6 +174,13 @@ std::string System::editSighting(Sighting& sighting){
 	bool cancelled = false;
 	std::string line, temp;
 	SightingData data = sighting.getData();
+
+	std::string oldDate = data.dateStr();
+	std::string oldCity = data.cityStr();
+	std::string oldTag = data.tagNum;
+
+
+
 	std::string prompt;
 	std::cout << sighting << "\n\n";
 	std::cout << "Enter sighting data, or \"exit\" to cancel.\nLeave blank to use original value\n\n";
@@ -367,7 +370,7 @@ std::string System::editSighting(Sighting& sighting){
 			ss.seekg(0);
 			ss.clear();
 			ss >> data.latitude;
-			validInput = ss.fail();
+			validInput = !ss.fail();
 			if(validInput){
 				validInput = data.latitude >= -90 && data.latitude <= 90;
 			}
@@ -397,7 +400,7 @@ std::string System::editSighting(Sighting& sighting){
 			ss.seekg(0);
 			ss.clear();
 			ss >> data.longitude;
-			validInput = ss.fail();
+			validInput = !ss.fail();
 			if(validInput){
 				validInput = data.longitude >= -180 && data.longitude <= 180;
 			}
@@ -483,7 +486,46 @@ std::string System::editSighting(Sighting& sighting){
 		return "Sighting update cancelled!";
 	}
 	sightings[data.id].update(data);
-	//	Save sightings (only end of file?)
+	//	Update other maps based on new data
+	Sighting* addr = &sightings[data.id];
+
+
+	std::vector<Sighting*>::iterator iter;
+	std::vector<Sighting*>::iterator end;
+	if(!(oldDate.compare(data.dateStr()) == 0)){
+		iter = dateSightings[oldDate].begin();
+		end = dateSightings[oldDate].end();
+		while(iter != end && (*iter)->getId() != data.id){
+			iter++;
+		}
+		if(iter != end){
+			dateSightings[oldDate].erase(iter);
+			dateSightings[data.dateStr()].push_back(addr);
+		}
+	}
+	if(!(oldCity.compare(data.cityStr()) == 0)){
+		iter = locationSightings[oldCity].begin();
+		end = locationSightings[oldCity].end();
+		while(iter != end && (*iter)->getId() != data.id){
+			iter++;
+		}
+		if(iter != end){
+			locationSightings[oldCity].erase(iter);
+			locationSightings[data.cityStr()].push_back(addr);
+		}
+	}
+	if(!(oldTag.compare(data.tagNum) == 0)){
+		iter = tagSightings[oldTag].begin();
+		end = tagSightings[oldTag].end();
+		while(iter != end && (*iter)->getId() != data.id){
+			iter++;
+		}
+		if(iter != end){
+			tagSightings[oldTag].erase(iter);
+			tagSightings[data.tagNum].push_back(addr);
+		}
+	}
+
 	Storage::storeSightings(sightings);
 	return "Sighting updated, ID = " + std::to_string(data.id);
 }
@@ -665,7 +707,7 @@ std::string System::createSighting(){
 			ss.seekg(0);
 			ss.clear();
 			ss >> data.latitude;
-			validInput = ss.fail();
+			validInput = !ss.fail();
 			if(validInput){
 				validInput = data.latitude >= -90 && data.latitude <= 90;
 			}
@@ -687,7 +729,7 @@ std::string System::createSighting(){
 			ss.seekg(0);
 			ss.clear();
 			ss >> data.longitude;
-			validInput = ss.fail();
+			validInput = !ss.fail();
 			if(validInput){
 				validInput = data.longitude >= -180 && data.longitude <= 180;
 			}
@@ -742,6 +784,8 @@ std::string System::createSighting(){
 	}
 	validInput = false;
 	prompt = "Tag Number (Blank for none): ";
+
+	std::map<std::string, Butterfly>::iterator tagIter;
 	while(!validInput && !cancelled){	//	Entering Longitude
 		std::cout << prompt;
 		std::getline(std::cin, line);
@@ -751,9 +795,29 @@ std::string System::createSighting(){
 			return "Sighting creation cancelled!";
 		}
 		else{
-			validInput = true;	//	Change this when we have tag database
+			tagIter = tags.find(line);
 			data.tagNum = line;
-			prompt = "Tag number exists for another species already, Try another: ";
+			if(tagIter == tags.end()){
+				if(users[currentUser].canTag()){
+					validInput = true;
+					tags[data.tagNum] = Butterfly(currentUser, data.tagNum, data.species, data.city, data.state, data.country,
+												  data.day, data.month, data.year, data.hour, data.minute, data.second, data.latitude, data.longitude);
+
+				}
+				else{
+					validInput = false;
+					prompt = "You are not a registered tagger and this tag is not yet in use.\nTag Number (Blank for none): ";
+				}
+			}
+			else{
+				if(data.species.compare(tagIter->second.getSpecies()) == 0){
+					validInput = true;
+				}
+				else{
+					validInput = false;
+					prompt = "This tag number is assigned to a different species already\nTag Number (Blank for none): ";
+				}
+			}
 		}
 	}
 	if(cancelled){
@@ -764,7 +828,18 @@ std::string System::createSighting(){
 	data = tmp.getData();
 	sightings[tmp.getId()] = Sighting(data);
 	//	Save sightings (only end of file?)
+	Sighting* addr = &sightings[tmp.getId()];
+
+
+	userSightings[currentUser].push_back(addr);
+	tagSightings[data.tagNum].push_back(addr);
+	locationSightings[data.cityStr()].push_back(addr);
+	dateSightings[data.dateStr()].push_back(addr);
+
 	Storage::saveSighting(sightings[data.id]);
+	if(data.tagNum.length() > 0){
+		Storage::saveTag(tags[data.tagNum]);
+	}
 	return "Sighting created, ID = " + std::to_string(data.id);
 }
 void System::viewUsers(){
@@ -845,7 +920,7 @@ std::string System::manageSightings(std::string message, unsigned int id){
 				ss.seekg(0);
 				ss.clear();
 				ss >> id;
-				validInput = ss.fail();
+				validInput = !ss.fail();
 				prompt = "Error parsing Sighting ID\nEnter Sighting ID or \"exit\" to cancel: ";
 				if(validInput){
 					iter = sightings.find(id);
@@ -892,6 +967,46 @@ std::string System::manageSightings(std::string message, unsigned int id){
 		std::cout << "Are you sure you want to delete this sighting (Y/Yes): ";
 		std::getline(std::cin, line);
 		if(line[0] == 'y' || line[0] == 'Y'){
+			SightingData data = sightings[id].getData();
+			std::vector<Sighting*>::iterator iter;
+			std::vector<Sighting*>::iterator end;
+
+			iter = userSightings[data.reporter].begin();
+			end = userSightings[data.reporter].end();
+			while(iter != end && (*iter)->getId() != id){
+				iter++;
+			}
+			if(iter != end){
+				userSightings[data.reporter].erase(iter);
+			}
+
+			iter = locationSightings[data.cityStr()].begin();
+			end = locationSightings[data.cityStr()].end();
+			while(iter != end && (*iter)->getId() != id){
+				iter++;
+			}
+			if(iter != end){
+				locationSightings[data.cityStr()].erase(iter);
+			}
+
+			iter = dateSightings[data.dateStr()].begin();
+			end = dateSightings[data.dateStr()].end();
+			while(iter != end && (*iter)->getId() != id){
+				iter++;
+			}
+			if(iter != end){
+				dateSightings[data.dateStr()].erase(iter);
+			}
+
+			iter = tagSightings[data.tagNum].begin();
+			end = tagSightings[data.tagNum].end();
+			while(iter != end && (*iter)->getId() != id){
+				iter++;
+			}
+			if(iter != end){
+				tagSightings[data.tagNum].erase(iter);
+			}
+
 			sightings.erase(id);
 			Storage::storeSightings(sightings);
 			return "Sighting " + std::to_string(id) + " Deleted.";
