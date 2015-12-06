@@ -366,7 +366,8 @@ std::string System::editSighting(Sighting& sighting){
 			ss.str(line);
 			ss.seekg(0);
 			ss.clear();
-			validInput = ss >> data.latitude;
+			ss >> data.latitude;
+			validInput = ss.fail();
 			if(validInput){
 				validInput = data.latitude >= -90 && data.latitude <= 90;
 			}
@@ -395,7 +396,8 @@ std::string System::editSighting(Sighting& sighting){
 			ss.str(line);
 			ss.seekg(0);
 			ss.clear();
-			validInput = ss >> data.longitude;
+			ss >> data.longitude;
+			validInput = ss.fail();
 			if(validInput){
 				validInput = data.longitude >= -180 && data.longitude <= 180;
 			}
@@ -662,7 +664,8 @@ std::string System::createSighting(){
 			ss.str(line);
 			ss.seekg(0);
 			ss.clear();
-			validInput = ss >> data.latitude;
+			ss >> data.latitude;
+			validInput = ss.fail();
 			if(validInput){
 				validInput = data.latitude >= -90 && data.latitude <= 90;
 			}
@@ -683,7 +686,8 @@ std::string System::createSighting(){
 			ss.str(line);
 			ss.seekg(0);
 			ss.clear();
-			validInput = ss >> data.longitude;
+			ss >> data.longitude;
+			validInput = ss.fail();
 			if(validInput){
 				validInput = data.longitude >= -180 && data.longitude <= 180;
 			}
@@ -840,7 +844,8 @@ std::string System::manageSightings(std::string message, unsigned int id){
 				ss.str(line);
 				ss.seekg(0);
 				ss.clear();
-				validInput = (ss >> id);
+				ss >> id;
+				validInput = ss.fail();
 				prompt = "Error parsing Sighting ID\nEnter Sighting ID or \"exit\" to cancel: ";
 				if(validInput){
 					iter = sightings.find(id);
