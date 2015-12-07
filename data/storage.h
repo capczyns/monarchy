@@ -8,8 +8,14 @@
 #include "user.h"
 #include "sighting.h"
 #include "butterfly.h"
+#include "dataFile.h"
+class SystemState{
+public:
+	unsigned int seqNum;
+};
 class Storage{
 private:
+	static std::string stateFile;
 	static std::string tagFile;
 	static std::string userFile;
 	static std::string sightingFile;
@@ -31,5 +37,8 @@ public:
 	static void storeTags(std::map<std::string, Butterfly>& tags);
 	static void saveTag(Butterfly& tag);
 	static void fetchTags(std::map<std::string, Butterfly>& tags);
+
+	static void saveState(SystemState& state);
+	static void loadState();
 };
 #endif

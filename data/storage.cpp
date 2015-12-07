@@ -11,8 +11,19 @@ std::string Storage::storageDir = "storage";
 std::string Storage::userFile = "Users.txt";
 std::string Storage::sightingFile = "Sightings.txt";
 std::string Storage::tagFile = "Tags.txt";
+std::string Storage::stateFile = "State.txt";
 
+void Storage::saveState(SystemState& state){
 
+}
+void Storage::loadState(){
+	std::ifstream inFile(storageDir + separator + stateFile);
+	unsigned int seqNum;
+	inFile >> seqNum;
+	if(!inFile.fail()){
+		DataFile::setSeqNum(seqNum);
+	}
+}
 void Storage::storeTags(std::map<std::string, Butterfly>& tags){
 	std::ofstream outFile;
 	outFile.open(storageDir + separator + tagFile), std::ofstream::trunc;
