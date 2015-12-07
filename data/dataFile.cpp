@@ -1,5 +1,8 @@
 #include "dataFile.h"
 unsigned int DataFile::seqNumber = 6;
+void DataFile::setSeqNum(unsigned int next){
+	seqNumber = next;
+}
 std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sightings, std::map<std::string, Butterfly>& tags,
 							 std::map<std::string, std::vector<Sighting*> > tagSightings,
 							 std::map<std::string, std::vector<Sighting*> > locationSightings){
@@ -173,5 +176,101 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 							 std::map<std::string, std::vector<Sighting*> > userSightings,
 							 std::map<std::string, std::vector<Sighting*> > dateSightings,
 							 std::map<std::string, std::vector<Sighting*> > locationSightings){
+	std::string line, path;
+	std::cout << "Enter path to import file: ";
+	std::getline(std::cin, path);
+	std::ifstream inFile(path);
+	bool trFound = false;
+	std::string hd;
+	unsigned int seqNum;
 
+/*
+	std::stringstream ss;
+	if(inFile.is_open()){
+		std::getline(inFile, hd);
+		seqNum = parseHeader(hd);
+		if(seqNum == 0){
+			return "Error: Header invalid.";
+		}
+		if(seqNum != seqNumber){
+			ss.str(std::string());
+			ss.clear();
+			ss.seekg(0);
+			ss << "Error: sequence number " << seqNumber << " expected, but number " << seqNum << " found.";
+			return(ss.str());
+		}
+		while(!trFound && std::getline(inFile, line)){
+
+		}
+	}
+	else{
+		return "Could not open file " + path;
+	}
+	*/
+	return line;
+}
+unsigned int parseHeader(std::string& header){
+	std::string line = "";
+	std::string hd = "";
+	std::string seqNum = "";
+	std::string date = "";
+
+	std::string year = "";
+	std::string month = "";
+	std::string day = "";
+
+	int index = 0;
+	while(index < header.length() && header[index] != ' '){
+		hd += header[index++];
+	}
+	if(hd.length() != 2){
+		return 0;
+	}
+	if(hd[0] != 'H' || hd[1] != 'D'){
+		return 0;
+	}
+	while(index < header.length() && header[index++] == ' '){
+	}
+	while(index < header.length() && (header[index] >= '0' && header[index] <= '9')){
+		seqNum += header[index++];
+	}
+	if(seqNum.length() < 1){
+		return 0;
+	}
+	while(index < header.length() && header[index++] == ' '){
+	}
+	while(index < header.length() && ((header[index] >= '0' && header[index] <= '9') || header[index] == '-')){
+		date += header[index++];
+	}
+	if(date.length() != 10){
+		return 0;
+	}
+	for(int i = 0; i < 4; ++i){
+		if(date[i] < '0' || date[i] > '9'){
+			return 0;
+		}
+		year += date[i];
+	}
+	for(int i = 5; i < 7; ++i){
+		if(date[i] < '0' || date[i] > '9'){
+			return 0;
+		}
+		month += date[i];
+	}
+	for(int i = 5; i < 7; ++i){
+		if(date[i] < '0' || date[i] > '9'){
+			return 0;
+		}
+		day += date[i];
+	}
+	while(index < header.length() && header[index++] == ' '){
+	}
+	if(index != header.length()){
+		return 0;
+	}
+
+	std::stringstream ss(seqNum);
+	unsigned int seqNumm;
+	ss >> seqNumm;
+	return seqNumm;
 }

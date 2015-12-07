@@ -215,8 +215,13 @@ std::string System::editSighting(Sighting& sighting){
 					validInput = false;
 				}
 			}
-			if(validInput)
-				data.year = std::stoi(temp);
+			if(validInput){
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.year;
+				//data.year = std::stoi(temp);
+			}
 			temp = "";
 			for(int index = 5; validInput && index < 7; ++index){
 				if(line[index] >= '0' && line[index] <= '9'){
@@ -228,7 +233,11 @@ std::string System::editSighting(Sighting& sighting){
 				}
 			}
 			if(validInput){
-				data.month = std::stoi(temp);
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.month;
+				//data.month = std::stoi(temp);
 			}
 			temp = "";
 			for(int index = 8; validInput && index < 10; ++index){
@@ -244,7 +253,11 @@ std::string System::editSighting(Sighting& sighting){
 				if(!(validInput = data.month > 0 && data.month <= 12)){
 					prompt = "Month must be between 1 and 12\nDate (YYYY-MM-DD): ";
 				}
-				data.day = std::stoi(temp);
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.day;
+				//data.day = std::stoi(temp);
 				if(data.day < 1 || data.day > 31){
 					prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
 					validInput = false;
@@ -301,8 +314,13 @@ std::string System::editSighting(Sighting& sighting){
 					validInput = false;
 				}
 			}
-			if(validInput)
-				data.hour = std::stoi(temp);
+			if(validInput){
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.hour;
+				//data.hour = std::stoi(temp);
+			}
 			temp = "";
 			for(int index = 3; validInput && index < 5; ++index){
 				if(line[index] >= '0' && line[index] <= '9'){
@@ -313,7 +331,11 @@ std::string System::editSighting(Sighting& sighting){
 				}
 			}
 			if(validInput){
-				data.minute = std::stoi(temp);
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.minute;
+				//data.minute = std::stoi(temp);
 			}
 			temp = "";
 			for(int index = 6; validInput && index < 8; ++index){
@@ -325,7 +347,11 @@ std::string System::editSighting(Sighting& sighting){
 				}
 			}
 			if(validInput){
-				data.second = std::stoi(temp);
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.second;
+				//data.second = std::stoi(temp);
 				if(data.hour < 0 || data.hour > 24){
 					validInput = false;
 					prompt = "Hour must be between 0 and 24\nTime (HH:MM:SS): ";
@@ -347,10 +373,14 @@ std::string System::editSighting(Sighting& sighting){
 		}
 	}
 	temp = "";
+	ss.str(std::string());
+	ss.seekg(0);
+	ss.clear();
 	if(data.latitude > 0){
-		temp = "+";
+		ss << '+';
 	}
-	temp += std::to_string(data.latitude);
+	ss << data.latitude;
+	temp = ss.str();
 	prompt = "Latitude (Blank to use " + temp + "): ";
 	validInput = false;
 	while(!validInput && !cancelled){	//	Entering Latitude
@@ -378,10 +408,14 @@ std::string System::editSighting(Sighting& sighting){
 	}
 	validInput = false;
 	temp = "";
+	ss.str(std::string());
+	ss.seekg(0);
+	ss.clear();
 	if(data.longitude > 0){
-		temp = "+";
+		ss << '+';
 	}
-	temp += std::to_string(data.longitude);
+	ss << data.longitude;
+	temp = ss.str();
 	prompt = "Longitude (Blank to use " + temp + "): ";
 	while(!validInput && !cancelled){	//	Entering Longitude
 		std::cout << prompt;
@@ -523,7 +557,12 @@ std::string System::editSighting(Sighting& sighting){
 	}
 
 	Storage::storeSightings(sightings);
-	return "Sighting updated, ID = " + std::to_string(data.id);
+	ss.str(std::string());
+	ss.seekg(0);
+	ss.clear();
+	ss << data.id;
+	temp = ss.str();
+	return "Sighting updated, ID = " + temp;
 }
 std::string System::createSighting(){
 	/*
@@ -560,8 +599,13 @@ std::string System::createSighting(){
 					validInput = false;
 				}
 			}
-			if(validInput)
-				data.year = std::stoi(temp);
+			if(validInput){
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.year;
+				//data.year = std::stoi(temp);
+			}
 			temp = "";
 			for(int index = 5; validInput && index < 7; ++index){
 				if(line[index] >= '0' && line[index] <= '9'){
@@ -573,7 +617,11 @@ std::string System::createSighting(){
 				}
 			}
 			if(validInput){
-				data.month = std::stoi(temp);
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.month;
+				//data.month = std::stoi(temp);
 			}
 			temp = "";
 			for(int index = 8; validInput && index < 10; ++index){
@@ -589,7 +637,11 @@ std::string System::createSighting(){
 				if(!(validInput = data.month > 0 && data.month <= 12)){
 					prompt = "Month must be between 1 and 12\nDate (YYYY-MM-DD): ";
 				}
-				data.day = std::stoi(temp);
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.day;
+				//data.day = std::stoi(temp);
 				if(data.day < 1 || data.day > 31){
 					prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
 					validInput = false;
@@ -643,8 +695,13 @@ std::string System::createSighting(){
 					validInput = false;
 				}
 			}
-			if(validInput)
-				data.hour = std::stoi(temp);
+			if(validInput){
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> temp;
+				//data.hour = std::stoi(temp);
+			}
 			temp = "";
 			for(int index = 3; validInput && index < 5; ++index){
 				if(line[index] >= '0' && line[index] <= '9'){
@@ -655,7 +712,11 @@ std::string System::createSighting(){
 				}
 			}
 			if(validInput){
-				data.minute = std::stoi(temp);
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.minute;
+				//data.minute = std::stoi(temp);
 			}
 			temp = "";
 			for(int index = 6; validInput && index < 8; ++index){
@@ -667,7 +728,11 @@ std::string System::createSighting(){
 				}
 			}
 			if(validInput){
-				data.second = std::stoi(temp);
+				ss.str(temp);
+				ss.seekg(0);
+				ss.clear();
+				ss >> data.second;
+				//data.second = std::stoi(temp);
 				if(data.hour < 0 || data.hour > 24){
 					validInput = false;
 					prompt = "Hour must be between 0 and 24\nTime (HH:MM:SS): ";
@@ -836,7 +901,12 @@ std::string System::createSighting(){
 	if(data.tagNum.length() > 0){
 		Storage::saveTag(tags[data.tagNum]);
 	}
-	return "Sighting created, ID = " + std::to_string(data.id);
+	ss.str(std::string());
+	ss.seekg(0);
+	ss.clear();
+	ss << data.id;
+	temp = ss.str();
+	return "Sighting created, ID = " + temp;
 }
 void System::viewUsers(){
 	/*
@@ -1005,18 +1075,33 @@ std::string System::manageSightings(std::string message, unsigned int id){
 
 			sightings.erase(id);
 			Storage::storeSightings(sightings);
-			return "Sighting " + std::to_string(id) + " Deleted.";
+			ss.str(std::string());
+			ss.seekg(0);
+			ss.clear();
+			ss << id;
+			line = ss.str();
+			return "Sighting " + line + " Deleted.";
 		}
 		else{
 			return "Delete Aborted";
 		}
 	}
 	if(cancelled){
-		return "Sighting " + std::to_string(id) + " update cancelled.";
+			ss.str(std::string());
+			ss.seekg(0);
+			ss.clear();
+			ss << id;
+			line = ss.str();
+		return "Sighting " + line + " update cancelled.";
 	}
 	else{
 	}
-	return "Sighting " + std::to_string(id) + " update successful!";
+	ss.str(std::string());
+	ss.seekg(0);
+	ss.clear();
+	ss << id;
+	line = ss.str();
+	return "Sighting " + line + " update successful!";
 
 }
 void System::reports(){
