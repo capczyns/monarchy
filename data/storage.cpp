@@ -104,8 +104,8 @@ void Storage::fetchSightings(std::map<unsigned int, Sighting>& sightings,
 				sightings[data.id] = Sighting(data);
 				addr = &sightings[data.id];
 				tagSightings[data.tagNum].push_back(addr);
-				dateSightings[data.tagNum].push_back(addr);
-				locationSightings[data.tagNum].push_back(addr);
+				dateSightings[data.dateStr()].push_back(addr);
+				locationSightings[data.cityStr()].push_back(addr);
 				userSightings[data.reporter].push_back(addr);
 			}
 		}

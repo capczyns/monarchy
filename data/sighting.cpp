@@ -127,38 +127,103 @@ void Sighting::saveStr(std::ostream& out){
 	out << country << std::endl;
 	out << tagNum << std::endl;
 }
+void SightingData::exportStr(std::ostream& out){
+	/*
+		Format:
+		Date(10)
+		Space(1)
+		Time(8)
+		Space(1)
+		+/-
+		Latitude(10)
+		+/-
+		Longitude(10)
+		Space(1)
+		City(30)
+		State(30)
+		Country(30)
+		Species(20)
+		TagNum(6)
+	*/
+		out << dateStr() << ' ' << std::setfill('0') << std::setw(2) << hour << ':' << std::setw(2) << minute << ':' << std::setw(2) << second << ' ';
+		if(latitude >= 0){
+			out << '+';
+			if(latitude < 10){
+				out << '0';
+			}
+			out << std::fixed << std::setprecision(7) << latitude;
+		}
+		else{
+			out << '-';
+			if(latitude > -10){
+				out << '0';
+			}
+			out << std::fixed << std::setprecision(7) << latitude * -1;
+		}
+		if(longitude >= 0){
+			out << '+';
+			if(longitude < 10){
+				out << '0';
+			}
+			if(longitude < 100){
+				out << '0';
+			}
+			out << std::fixed << std::setprecision(7) << longitude;
+		}
+		else{
+			out << '-';
+			if(longitude > -10){
+				out << '0';
+			}
+			if(longitude > -100){
+				out << '0';
+			}
+			out << std::fixed << std::setprecision(7) << longitude * -1;
+		}
+		out << ' ' << cityStr();
+		out << species.substr(0, 20);
+		if(species.length() < 20){
+			out << std::string(20 - species.length(), ' ');
+		}
+		out << tagNum;
+		/*
+		for(int index = 0; index < 20; ++index){
+			if(index < species.length()){
+				out << species[index];
+			}
+			else{
+				out << ' ';
+			}
+		}
+		for(int index = 0; index < 6; ++index){
+			if(index < tagNum.length()){
+				out << tagNum[index];
+			}
+			else{
+				out << ' ';
+			}
+		}
+		*/
+}
 std::string SightingData::dateStr(){
 	std::stringstream ss;
 	ss << std::setfill('0') << std::setw(4) << year << '-' << std::setw(2) << month << '-' << std::setw(2) << day;
 	return ss.str();
 }
 std::string SightingData::cityStr(){
-	char cityStr[90];
-	for(int index = 0; index < 30; ++index){
-		if(index < city.length()){
-			cityStr[index] = city[index];
-		}
-		else{
-			cityStr[index] = ' ';
-		}
+	std::string rtn = city.substr(0,30);
+	if(city.length() < 30){
+		rtn += std::string(30 - city.length(), ' ');
 	}
-	for(int index = 0; index < 30; ++index){
-		if(index < city.length()){
-			cityStr[index+30] = city[index];
-		}
-		else{
-			cityStr[index+30] = ' ';
-		}
+	rtn += state.substr(0,30);
+	if(state.length() < 30){
+		rtn += std::string(30 - state.length(), ' ');
 	}
-	for(int index = 0; index < 30; ++index){
-		if(index < city.length()){
-			cityStr[index+60] = city[index];
-		}
-		else{
-			cityStr[index+60] = ' ';
-		}
+	rtn += country.substr(0,30);
+	if(country.length() < 30){
+		rtn += std::string(30 - country.length(), ' ');
 	}
-	return std::string(cityStr);
+	return rtn;
 }
 std::ostream& operator<<(std::ostream& out, const Sighting& sighting){
 	out << "Sighting ID: " << sighting.id << "     Reporter: " << sighting.reporter << "     Date: "

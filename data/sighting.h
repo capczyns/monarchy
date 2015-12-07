@@ -27,6 +27,7 @@ public:
 	SightingData() : SightingData("", 0, 0, 0, 0, 0, 0, 0.0, 0.0, "", "", "", "", "", 0){}
 	std::string dateStr();
 	std::string cityStr();
+	void exportStr(std::ostream& out);
 };
 class Sighting{
 private:

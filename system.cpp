@@ -148,19 +148,15 @@ std::string System::importExport(){
 	}
 	if(line[0] != '3'){
 		std::cout << "\n\n\n";
-		std::cout << "Enter file path: ";
-		std::getline(std::cin, path);
 		switch(line[0]){
 			case '1':
 				std::cout << "\nCheck import data and whatnot ";
 				prompt = "File Import Success/Fail";
 				break;
 			case '2':
-				std::cout << "\nExport sightings to file ";
-				prompt = "File Export Success/Fail";
+				return DataFile::exportSightings(sightings, tags, tagSightings, locationSightings);
 				break;
 		};
-		std::getline(std::cin, line);
 		return prompt;
 	}
 	return "File operation cancelled.";
