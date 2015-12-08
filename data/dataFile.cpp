@@ -482,7 +482,7 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 					}
 				}
 				else{
-					if(tagNum.length() > 0){
+					if(sighting.tagNum.length() > 0){
 						tagIter = tags.find(sighting.tagNum);
 						if(tagIter == tags.end()){
 							addError(errors, "Tagging not logged yet");

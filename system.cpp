@@ -8,6 +8,7 @@ void System::start(){
 		Starts the Butterfly Tracking System
 	*/
 	Storage::fetchUsers(users);
+	Storage::loadState();
 	loginMenu("");
 }
 bool System::createUser(){
@@ -698,7 +699,7 @@ std::string System::createSighting(){
 				ss.str(temp);
 				ss.seekg(0);
 				ss.clear();
-				ss >> temp;
+				ss >> data.hour;
 				//data.hour = std::stoi(temp);
 			}
 			temp = "";
@@ -732,7 +733,7 @@ std::string System::createSighting(){
 				ss.clear();
 				ss >> data.second;
 				//data.second = std::stoi(temp);
-				if(data.hour < 0 || data.hour > 24){
+				if(data.hour < 0 || data.hour > 23){
 					validInput = false;
 					prompt = "Hour must be between 0 and 24\nTime (HH:MM:SS): ";
 				}
@@ -1152,7 +1153,9 @@ void System::clear(){
 	/*
 		Clears the screen
 	*/
-	std::cout << std::string(100,'\n');
+		for(int index = 0; index < 100; ++index){
+			std::cout << std::endl;
+		}
 }
 void System::editAccount(){
 	std::string line = "";
@@ -1265,7 +1268,7 @@ void System::mainMenu(){
 					break;
 				case '6':
 					if(deleteAccount()){
-						line = "7";
+						line = "8";
 					}
 					else{
 						prompt = "Delete cancelled\n" + prompt;
