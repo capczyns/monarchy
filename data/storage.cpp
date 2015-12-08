@@ -14,14 +14,22 @@ std::string Storage::tagFile = "Tags.txt";
 std::string Storage::stateFile = "State.txt";
 
 void Storage::saveState(SystemState& state){
-
+	std:: ofstream outFile;
+	outFile.open(storageDir + separator + stateFile, std::ofstream::trunc);
+	if(outFile.is_open()){
+		outFile << state.seqNum;
+		outFile.close();
+	}
 }
 void Storage::loadState(){
 	std::ifstream inFile(storageDir + separator + stateFile);
 	unsigned int seqNum;
-	inFile >> seqNum;
-	if(!inFile.fail()){
-		DataFile::setSeqNum(seqNum);
+	if(inFile.is_open()){
+		inFile >> seqNum;
+		if(!inFile.fail()){
+			DataFile::setSeqNum(seqNum);
+		}
+		inFile.close();
 	}
 }
 void Storage::storeTags(std::map<std::string, Butterfly>& tags){
