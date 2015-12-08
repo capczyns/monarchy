@@ -29,6 +29,9 @@ Sighting::Sighting(SightingData& data){
 	if(id >= nextId){
 		nextId = id + 1;
 	}
+	else if(id == 0){
+		id = nextId++;
+	}
 }
 void Sighting::update(std::string reporter, int year, int month, int day,
 					  int hour, int minute, int second, double latitude, double longitude,

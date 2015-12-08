@@ -107,3 +107,22 @@ ButterflyData::ButterflyData(std::string tagger, std::string tagNum, std::string
 	this->latitude = latitude;
 	this->longitude = longitude;
 }
+ButterflyData::ButterflyData(SightingData& data){
+	fromSighting(data);
+}
+void ButterflyData::fromSighting(SightingData& data){
+	tagger = data.reporter;
+	tagNum = data.tagNum;
+	species = data.species;
+	city = data.city;
+	state = data.state;
+	country = data.country;
+	day = data.day;
+	month = data.month;
+	year = data.year;
+	hour = data.hour;
+	minute = data.minute;
+	second = data.second;
+	latitude = data.latitude;
+	longitude = data.longitude;
+}

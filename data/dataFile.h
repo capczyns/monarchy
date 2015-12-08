@@ -15,6 +15,8 @@ private:
 	static void clear();
 	unsigned static int parseHeader(std::string& header);
 	static std::string parseLine(std::string& line, SightingData& sightingData, bool& valid);
+	static void prepStream(std::stringstream& ss, std::string str);
+	static void addError(std::map<std::string, int>& errors, std::string error);
 public:
 	static std::string exportSightings(std::map<unsigned int, Sighting>& sightings, std::map<std::string, Butterfly>& tags,
 							  std::map<std::string, std::vector<Sighting*> > tagSightings,

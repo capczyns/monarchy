@@ -150,8 +150,7 @@ std::string System::importExport(){
 		std::cout << "\n\n\n";
 		switch(line[0]){
 			case '1':
-				std::cout << "\nCheck import data and whatnot ";
-				prompt = "File Import Success/Fail";
+				return DataFile::import(sightings, tags, tagSightings, userSightings, dateSightings, locationSightings);
 				break;
 			case '2':
 				return DataFile::exportSightings(sightings, tags, tagSightings, locationSightings);
@@ -952,7 +951,7 @@ bool System::deleteAccount(){
 	if(line.length() > 0 && line.compare("DELETE") == 0){
 		std::cout << "Deleting account, goodbye!\n";
 		if(users.find(currentUser) != users.end()){
-			users[currentUser].deleteUser();
+			users.erase(users.find(currentUser));
 			Storage::storeUsers(users);
 		}
 		return true;
