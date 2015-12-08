@@ -352,14 +352,14 @@ std::string System::editSighting(Sighting& sighting){
 				ss.clear();
 				ss >> data.second;
 				//data.second = std::stoi(temp);
-				if(data.hour < 0 || data.hour > 24){
+				if(data.hour < 0 || data.hour > 23){
 					validInput = false;
-					prompt = "Hour must be between 0 and 24\nTime (HH:MM:SS): ";
+					prompt = "Hour must be between 0 and 23\nTime (HH:MM:SS): ";
 				}
-				if(data.minute < 0 || data.minute > 60 ||
-				   data.second < 0 || data.second > 60){
+				if(data.minute < 0 || data.minute > 59 ||
+				   data.second < 0 || data.second > 59){
 					validInput = false;
-					prompt = "Minutes and Seconds must be between 0 and 60\nTime (HH:MM:SS): ";
+					prompt = "Minutes and Seconds must be between 0 and 59\nTime (HH:MM:SS): ";
 				}
 			}
 			else{
@@ -735,12 +735,12 @@ std::string System::createSighting(){
 				//data.second = std::stoi(temp);
 				if(data.hour < 0 || data.hour > 23){
 					validInput = false;
-					prompt = "Hour must be between 0 and 24\nTime (HH:MM:SS): ";
+					prompt = "Hour must be between 0 and 23\nTime (HH:MM:SS): ";
 				}
-				if(data.minute < 0 || data.minute > 60 ||
-				   data.second < 0 || data.second > 60){
+				if(data.minute < 0 || data.minute > 59 ||
+				   data.second < 0 || data.second > 59){
 					validInput = false;
-					prompt = "Minutes and Seconds must be between 0 and 60\nTime (HH:MM:SS): ";
+					prompt = "Minutes and Seconds must be between 0 and 59\nTime (HH:MM:SS): ";
 				}
 			}
 			else{
