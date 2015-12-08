@@ -30,3 +30,35 @@ public:
 	static void setSeqNum(unsigned int next);
 };
 #endif
+/*
+	Sightings File Req:
+
+		Header:
+			HD
+			spaces
+			seq num
+			spaces
+			10 char date
+
+		Entry:
+			every entry is a new line
+			every entry has at least 171 characters
+			1 char entry type
+			1 space
+			10 char username
+			19 char date + time
+			1 space
+			10 char latitude
+			10 char longitude
+			1 space
+			30 char city
+			30 char state
+			30 char country
+			20 char species
+			at least 6 char tag
+
+		Trailing Record:
+			TR
+			spaces
+			#entries
+*/

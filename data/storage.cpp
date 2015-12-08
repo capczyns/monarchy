@@ -8,21 +8,21 @@ std::string Storage::separator = "/";
 
 
 std::string Storage::storageDir = "storage";
-std::string Storage::userFile = "Users.txt";
-std::string Storage::sightingFile = "Sightings.txt";
-std::string Storage::tagFile = "Tags.txt";
-std::string Storage::stateFile = "State.txt";
+std::string Storage::userFile = "Users.monarchy";
+std::string Storage::sightingFile = "Sightings.monarchy";
+std::string Storage::tagFile = "Tags.monarchy";
+std::string Storage::stateFile = "State.monarchy";
 
 void Storage::saveState(SystemState& state){
 	std:: ofstream outFile;
-	outFile.open(storageDir + separator + stateFile, std::ofstream::trunc);
+	outFile.open(stateFile, std::ofstream::trunc);
 	if(outFile.is_open()){
 		outFile << state.seqNum;
 		outFile.close();
 	}
 }
 void Storage::loadState(){
-	std::ifstream inFile(storageDir + separator + stateFile);
+	std::ifstream inFile(stateFile);
 	unsigned int seqNum;
 	if(inFile.is_open()){
 		inFile >> seqNum;
@@ -34,7 +34,7 @@ void Storage::loadState(){
 }
 void Storage::storeTags(std::map<std::string, Butterfly>& tags){
 	std::ofstream outFile;
-	outFile.open(storageDir + separator + tagFile), std::ofstream::trunc;
+	outFile.open(tagFile), std::ofstream::trunc;
 	if(outFile.is_open()){
 		for(std::map<std::string, Butterfly>::iterator iter = tags.begin(); iter != tags.end(); ++iter){
 			iter->second.saveStr(outFile);
@@ -43,7 +43,7 @@ void Storage::storeTags(std::map<std::string, Butterfly>& tags){
 }
 void Storage::saveTag(Butterfly& tag){
 	std::ofstream outFile;
-	outFile.open(storageDir + separator + tagFile, std::ofstream::app);
+	outFile.open(tagFile, std::ofstream::app);
 	if(outFile.is_open()){
 		tag.saveStr(outFile);
 		outFile.close();
@@ -52,7 +52,7 @@ void Storage::saveTag(Butterfly& tag){
 void Storage::fetchTags(std::map<std::string, Butterfly>& tags){
 	std::string line;
 
-	std::ifstream inFile(storageDir + separator + tagFile);
+	std::ifstream inFile(tagFile);
 	ButterflyData data;
 	std::stringstream ss;
 	Sighting* addr;
@@ -73,7 +73,7 @@ void Storage::fetchTags(std::map<std::string, Butterfly>& tags){
 }
 void Storage::saveSighting(Sighting& sighting){
 	std::ofstream outFile;
-	outFile.open(storageDir + separator + sightingFile, std::ofstream::app);
+	outFile.open(sightingFile, std::ofstream::app);
 	if(outFile.is_open()){
 		sighting.saveStr(outFile);
 		outFile.close();
@@ -81,7 +81,7 @@ void Storage::saveSighting(Sighting& sighting){
 }
 void Storage::saveUser(User& user){
 	std::ofstream outFile;
-	outFile.open(storageDir + separator + userFile, std::ofstream::app);
+	outFile.open(userFile, std::ofstream::app);
 	if(outFile.is_open()){
 		user.saveStr(outFile);
 		outFile.close();
@@ -89,7 +89,7 @@ void Storage::saveUser(User& user){
 }
 void Storage::storeSightings(std::map<unsigned int, Sighting>& sightings){
 	std::ofstream outFile;
-	outFile.open(storageDir + separator + sightingFile, std::ofstream::trunc);
+	outFile.open(sightingFile, std::ofstream::trunc);
 	if(outFile.is_open()){
 		for(std::map<unsigned int, Sighting>::iterator i = sightings.begin(); i != sightings.end(); ++i){
 			i->second.saveStr(outFile);
@@ -106,7 +106,7 @@ void Storage::fetchSightings(std::map<unsigned int, Sighting>& sightings,
 							 std::map<std::string, std::vector<Sighting*> >& userSightings){
 	std::string line;
 
-	std::ifstream inFile(storageDir + separator + sightingFile);
+	std::ifstream inFile(sightingFile);
 	SightingData data;
 	std::stringstream ss;
 	Sighting* addr;
@@ -135,7 +135,7 @@ void Storage::fetchSightings(std::map<unsigned int, Sighting>& sightings,
 }
 void Storage::storeUsers(std::map<std::string, User>& users){
 	std::ofstream outFile;
-	outFile.open(storageDir + separator + userFile, std::ofstream::trunc);
+	outFile.open(userFile, std::ofstream::trunc);
 	if(outFile.is_open()){
 		for(std::map<std::string, User>::iterator i = users.begin(); i != users.end(); ++i){
 			i->second.saveStr(outFile);
@@ -161,7 +161,7 @@ void Storage::fetchUsers(std::map<std::string, User>& users){
 	bool exists;
 	bool tagger;
 
-	std::ifstream inFile(storageDir + separator + userFile);
+	std::ifstream inFile(userFile);
 	if(inFile.is_open()){
 		while(std::getline(inFile, name)){
 			if(name.length() > 0){
