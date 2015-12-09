@@ -3,6 +3,8 @@
 #include "external/ChrisHash.h"
 #include <iostream>
 #include <fstream>
+std::string System::versionNumber = "Version 0.0.1";
+std::string System::programTitle = "Monarchy Butterfly Tracking System";
 void System::start(){
 	/*
 		Starts the Butterfly Tracking System
@@ -12,7 +14,8 @@ void System::start(){
 	loginMenu("");
 }
 bool System::createUser(){
-	std::string prompt = "User ID: ";
+	std::string pageName = "Create User Account";
+	std::string prompt = programTitle + "\n" + pageName + "\n\n" + "User ID: ";
 	bool validInput = false;
 	bool tagger;
 	std::string name, realName, pwd, address, city, state, zip, cellPhone, homePhone, organization, line;
@@ -24,7 +27,7 @@ bool System::createUser(){
 		validInput = true;
 		validInput = (users.find(name) == users.end());
 		if(!validInput){
-			prompt = "User ID already exists\nUser ID: ";
+			prompt = programTitle + "\n" + pageName + "\n\n" + "User ID already exists\nUser ID: ";
 		}
 	}
 	std::cout << "Password: ";
@@ -40,12 +43,95 @@ bool System::createUser(){
 	std::getline(std::cin, city);
 	std::cout << "State: ";
 	std::getline(std::cin, state);
-	std::cout << "Zip: ";
-	std::getline(std::cin, zip);
-	std::cout << "Cell Phone: ";
-	std::getline(std::cin, cellPhone);
-	std::cout << "Home Phone: ";
-	std::getline(std::cin, homePhone);
+	prompt = "Zip (##### or #####-####):";
+	validInput = false;
+	while(!validInput){
+		validInput = true;
+		std::cout << prompt;
+		prompt = "Invalid Zip\nZip (##### or #####-####): ";
+		std::getline(std::cin, zip);
+		if(!(zip.length() == 5 || zip.length() == 10)){
+			validInput = false;
+			continue;
+		}
+		for(int index = 0; validInput && index < 5; ++index){
+			if(zip[index] < '0' || zip[index] > '9'){
+				validInput = false;
+			}
+		}
+		if(zip.length() == 10){
+			if(zip[5] != '-'){
+				validInput = false;
+			}
+			for(int index = 6; validInput && index < 10; ++index){
+				if(zip[index] < '0' || zip[index] > '9'){
+					validInput = false;
+				}
+			}
+		}
+	}
+	prompt = "Cell Phone (###-###-####): ";
+	validInput = false;
+	while(!validInput){
+		validInput = true;
+		std::cout << prompt;
+		prompt = "Invalid Phone Number\nCell Phone (###-###-####): ";
+		std::getline(std::cin, cellPhone);
+		if(cellPhone.length() != 12){
+			validInput = false;
+			continue;
+		}
+		if(cellPhone[3] != '-' || cellPhone[7] != '-'){
+			validInput = false;
+			continue;
+		}
+		for(int index = 0; validInput && index < 3; ++index){
+			if(cellPhone[index] < '0' || cellPhone[index] > '9'){
+				validInput = false;
+			}
+		}
+		for(int index = 4; validInput && index < 7; ++index){
+			if(cellPhone[index] < '0' || cellPhone[index] > '9'){
+				validInput = false;
+			}
+		}
+		for(int index = 8; validInput && index < 10; ++index){
+			if(cellPhone[index] < '0' || cellPhone[index] > '9'){
+				validInput = false;
+			}
+		}
+	}
+	validInput = false;
+	prompt = "Home Phone (###-###-####): ";
+	while(!validInput){
+		validInput = true;
+		std::cout << prompt;
+		prompt = "Invalid Phone Number\nHome Phone (###-###-####): ";
+		std::getline(std::cin, homePhone);
+		if(homePhone.length() != 12){
+			validInput = false;
+			continue;
+		}
+		if(homePhone[3] != '-' || homePhone[7] != '-'){
+			validInput = false;
+			continue;
+		}
+		for(int index = 0; validInput && index < 3; ++index){
+			if(homePhone[index] < '0' || homePhone[index] > '9'){
+				validInput = false;
+			}
+		}
+		for(int index = 4; validInput && index < 7; ++index){
+			if(homePhone[index] < '0' || homePhone[index] > '9'){
+				validInput = false;
+			}
+		}
+		for(int index = 8; validInput && index < 10; ++index){
+			if(homePhone[index] < '0' || homePhone[index] > '9'){
+				validInput = false;
+			}
+		}
+	}
 	std::cout << "Organization: ";
 	std::getline(std::cin, organization);
 	std::cout << "Tagger (Y/YES for yes, anything else for no): ";
@@ -68,7 +154,9 @@ void System::loginMenu(std::string message){
 	std::string line = "";
 	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
 		clear();
-		std::cout << "Login Menu:\n\n"
+		std::cout << programTitle << '\n'
+				  << versionNumber << '\n'
+				  << "Login Menu:\n\n"
 				  << "1. Login\n"
 				  << "2. Create Account\n"
 				  << "3. Quit\n\n";
@@ -92,9 +180,10 @@ void System::login(std::string message){
 	/*
 		Handles the login process
 	*/
+	std::string pageName = "User Login";
 	std::string name, pwd, prompt, line;
 	bool validName = false;
-	prompt = message + "\n\nUsername: ";
+	prompt = programTitle + "\n" + pageName + "\n\n" + message + "\n\nUsername: ";
 	while(!validName){
 		clear();
 		std::cout << prompt;
@@ -139,7 +228,8 @@ std::string System::importExport(){
 	std::string prompt = "\nChoose option: ";
 	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
 		clear();
-		std::cout << "Import/Export Menu:\n"
+		std::cout << programTitle << '\n'
+				  << "Import/Export Menu:\n"
 				  << "1. Import\n"
 				  << "2. Export\n"
 				  << "3. Cancel\n";
@@ -178,6 +268,7 @@ std::string System::editSighting(Sighting& sighting){
 
 
 	std::string prompt;
+	std::cout << programTitle << "\nEdit Sighting\n\n";
 	std::cout << sighting << "\n\n";
 	std::cout << "Enter sighting data, or \"exit\" to cancel.\nLeave blank to use original value\n\n";
 
@@ -575,7 +666,7 @@ std::string System::createSighting(){
 	SightingData data;
 	std::stringstream ss;
 	std::string prompt;
-
+	std::cout << programTitle << "\n" << "Create Sighting\n\n";
 	std::cout << "Enter sighting data, or \"exit\" to cancel.\n\n";
 
 	prompt = "Date (YYYY-MM-DD): ";
@@ -855,6 +946,10 @@ std::string System::createSighting(){
 			(line[3] == 't' || line[3] == 'T')){
 			return "Sighting creation cancelled!";
 		}
+		else if(line.length() == 0){
+			validInput = true;
+			data.tagNum = "";
+		}
 		else{
 			tagIter = tags.find(line);
 			data.tagNum = line;
@@ -913,6 +1008,7 @@ void System::viewUsers(){
 		Handles viewing users
 	*/
 	clear();
+	std::cout << programTitle << '\n';
 	std::cout << "Displaying Users:\n\n";
 	std::string line = "";
 	std::string prompt = "\nType \"exit\" to exit or press enter for more: ";
@@ -941,6 +1037,7 @@ bool System::deleteAccount(){
 	/*
 		Handles deleting the user's account
 	*/
+	std::cout << programTitle << '\n' << "Delete Account";
 	std::string line = "";
 	std::cout << "\n\nEnter \"delete\" to confirm account deletion: ";
 	std::getline(std::cin, line);
@@ -965,7 +1062,7 @@ std::string System::manageSightings(std::string message, unsigned int id){
 	*/
 	clear();
 	std::string line = "";
-	std::string prompt = "\nEnter Sighting ID or \"exit\" to cancel: ";
+	std::string prompt = programTitle + "\nManage Sightings\n\nEnter Sighting ID or \"exit\" to cancel: ";
 	bool validInput = false;
 	bool cancelled = false;
 	bool deleted = false;
@@ -987,11 +1084,11 @@ std::string System::manageSightings(std::string message, unsigned int id){
 				ss.clear();
 				ss >> id;
 				validInput = !ss.fail();
-				prompt = "Error parsing Sighting ID\nEnter Sighting ID or \"exit\" to cancel: ";
+				prompt = programTitle + "\nManage Sightings\n\nError parsing Sighting ID\nEnter Sighting ID or \"exit\" to cancel: ";
 				if(validInput){
 					iter = sightings.find(id);
 					validInput = (iter != sightings.end());
-					prompt = "Sighting ID not found\nEnter Sighting ID or \"exit\" to cancel: ";
+					prompt = programTitle + "\nManage Sightings\n\nSighting ID not found\nEnter Sighting ID or \"exit\" to cancel: ";
 				}
 			}
 		}
@@ -1000,6 +1097,7 @@ std::string System::manageSightings(std::string message, unsigned int id){
 	line = "";
 	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
 		clear();
+		std::cout << programTitle << "\n";
 		std::cout << iter->second;
 		std::cout << "\n\nManage Sightings Menu:\n"
 				  << "1. Update\n"
@@ -1112,6 +1210,7 @@ void System::reports(){
 	std::string prompt = "\nEnter Selection: ";
 	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '7')){
 		clear();
+		std::cout << programTitle << "\n";
 		std::cout << "Reports Menu:\n\n"
 				  << "1. Hotspot Report\n"
 				  << "2. Migration Report\n"
@@ -1165,9 +1264,12 @@ void System::editAccount(){
 	std::string homePhone = users[currentUser].getHomePhone();
 	std::string cellPhone = users[currentUser].getCellPhone();
 	std::string organization = users[currentUser].getOrganization();
+	std::string prompt;
+	bool validInput = false;
 
 	bool tagger;
 	clear();
+	std::cout << programTitle << "\nEdit Account\n\n";
 	std::cout << "Name (Blank to use " + realName + "): ";
 	std::getline(std::cin, line);
 	if(line.length()> 0){
@@ -1203,6 +1305,110 @@ void System::editAccount(){
 	if(line.length() > 0){
 		cellPhone = line;
 	}
+	prompt = "Zip (##### or #####-####):";
+	validInput = false;
+	while(!validInput){
+		validInput = true;
+		std::cout << prompt;
+		prompt = "Invalid Zip\nZip (##### or #####-####): ";
+		std::getline(std::cin, line);
+		if(line.length() == 0){
+			continue;
+		}
+		if(!(line.length() == 5 || line.length() == 10)){
+			validInput = false;
+			continue;
+		}
+		for(int index = 0; validInput && index < 5; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				validInput = false;
+			}
+		}
+		if(zip.length() == 10){
+			if(line[5] != '-'){
+				validInput = false;
+			}
+			for(int index = 6; validInput && index < 10; ++index){
+				if(line[index] < '0' || line[index] > '9'){
+					validInput = false;
+				}
+			}
+		}
+	}
+	if(line.length() != 0){
+		zip = line;
+	}
+	prompt = "Cell Phone (###-###-####): ";
+	validInput = false;
+	while(!validInput){
+		validInput = true;
+		std::cout << prompt;
+		prompt = "Invalid Phone Number\nCell Phone (###-###-####): ";
+		std::getline(std::cin, line);
+		if(line.length() == 0){
+			continue;
+		}
+		if(line.length() != 12){
+			validInput = false;
+			continue;
+		}
+		if(line[3] != '-' || line[7] != '-'){
+			validInput = false;
+			continue;
+		}
+		for(int index = 0; validInput && index < 3; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				validInput = false;
+			}
+		}
+		for(int index = 4; validInput && index < 7; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				validInput = false;
+			}
+		}
+		for(int index = 8; validInput && index < 10; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				validInput = false;
+			}
+		}
+	}
+	if(line.length() != 0){
+		cellPhone = line;
+	}
+	validInput = false;
+	prompt = "Home Phone (###-###-####): ";
+	while(!validInput){
+		validInput = true;
+		std::cout << prompt;
+		prompt = "Invalid Phone Number\nHome Phone (###-###-####): ";
+		std::getline(std::cin, line);
+		if(line.length() != 12){
+			validInput = false;
+			continue;
+		}
+		if(line[3] != '-' || line[7] != '-'){
+			validInput = false;
+			continue;
+		}
+		for(int index = 0; validInput && index < 3; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				validInput = false;
+			}
+		}
+		for(int index = 4; validInput && index < 7; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				validInput = false;
+			}
+		}
+		for(int index = 8; validInput && index < 10; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				validInput = false;
+			}
+		}
+	}
+	if(line.length() != 0){
+		homePhone = line;
+	}
 	std::cout << "Organization (Blank to use " + organization + "): ";
 	std::getline(std::cin, line);
 	if(line.length() > 0){
@@ -1230,6 +1436,7 @@ void System::mainMenu(){
 	std::string line = "";
 	std::string prompt = "Enter Selection: ";
 	while(line.length() < 1 || line[0] != '8'){
+		std::cout << programTitle << "\n";
 		std::cout << "Main Menu:\n\n"
 				  << "1. View All Users\n"
 				  << "2. Manage Sightings\n"

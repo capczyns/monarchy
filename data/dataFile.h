@@ -9,6 +9,7 @@
 #include <vector>
 #include <fstream>
 #include "storage.h"
+#include "../system.h"
 class DataFile{
 private:
 	unsigned static int seqNumber;
