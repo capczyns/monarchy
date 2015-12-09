@@ -35,7 +35,9 @@ private:
 	std::map<std::string, std::vector<Sighting*> > locationSightings;
 	std::map<std::string, std::vector<Sighting*> > dateSightings;
 	std::string currentUser;
+	static std::string versionNumber;
 public:
+	static std::string programTitle;
 	void start();
 };
 #endif

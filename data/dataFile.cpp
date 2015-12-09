@@ -22,8 +22,9 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 		line = "";
 		prompt = "Enter selection: ";
 		while(line.length() < 1 && !(line[0] >= '1' && line[0] <= '4')){
-			std::cout << "FilePath: " << path << "\n\n"
-					  << "Export Menu:\n"
+			std::cout << System::programTitle << "\n";
+			std::cout << "Export Menu:\n"
+					  << "FilePath: " << path << "\n"
 					  << "1. Export All Sightings\n"
 					  << "2. Export Sightings for Location\n"
 					  << "3. Export Sightings for Tag\n"
@@ -177,6 +178,7 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 							 std::map<std::string, std::vector<Sighting*> > dateSightings,
 							 std::map<std::string, std::vector<Sighting*> > locationSightings){
 	std::string line, path, temp;
+	std::cout << System::programTitle << "\nFile Import\n\n";
 	std::cout << "Enter path to import file: ";
 	std::getline(std::cin, path);
 	std::ifstream inFile(path);
