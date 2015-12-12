@@ -185,8 +185,8 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 	bool trFound = false;
 	std::string hd;
 	unsigned int seqNum = 0;
-	unsigned int numEntries;
-	unsigned int numReported;
+	unsigned int numEntries = 0;
+	unsigned int numReported = 0;
 	ButterflyData butterfly;
 	SightingData sighting;
 	bool tagging = false;
