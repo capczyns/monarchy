@@ -52,6 +52,37 @@ void Butterfly::update(ButterflyData& data){
 	latitude = data.latitude;
 	longitude = data.longitude;
 }
+bool Butterfly::sameSpecies(const std::string& other){
+	if(other.length() != species.length()){
+		return false;
+	}
+	for(int index = 0; index < species.length(); ++index){
+		if(species[index] >= 'a' && species[index] <= 'z'){
+			if(other[index] >= 'A' && other[index] <= 'Z'){
+				if(other[index] + ('a' - 'A') != species[index]){
+					return false;
+				}
+			}
+			else if(other[index] != species[index]){
+				return false;
+			}
+		}
+		else if(species[index] >= 'A' && species[index] <= 'Z'){
+			if(other[index] >= 'a' && other[index] <= 'z'){
+				if(species[index] + ('a' - 'A') != other[index]){
+					return false;
+				}
+			}
+			else if(other[index] != species[index]){
+				return false;
+			}
+		}
+		else if(species[index] != other[index]){
+			return false;
+		}
+	}
+	return true;
+}
 ButterflyData Butterfly::getData(){
 	return ButterflyData(tagger, tagNum, species, city, state, country, day, month, year, hour, minute, second, latitude, longitude);
 }

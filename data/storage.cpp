@@ -113,7 +113,8 @@ void Storage::fetchSightings(std::map<unsigned int, Sighting>& sightings,
 	if(inFile.is_open()){
 		while(std::getline(inFile, data.species)){
 			if(data.species.length() > 0){
-				inFile >> data.id >> data.year >> data.month >> data.day >> data.hour >> data.minute >> data.second >> data.latitude >> data.longitude;
+				inFile >> data.id >> data.year >> data.month >> data.day >> data.hour >> data.minute >> data.second >> data.latitude >> data.longitude 
+					   >> data.weather.temp >> data.weather.windSpeed >> data.weather.windDir >> data.weather.precipitation;
 				inFile.ignore(10, '\n');
 				std::getline(inFile, data.reporter);
 				std::getline(inFile, data.city);
