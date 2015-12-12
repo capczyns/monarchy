@@ -9,6 +9,8 @@ Visual Studio 2015:
   Click browse and navigate to the project directory
   Set a project name, press next
   from Project Type select Console application project
+  Click next
+  Under "Preprocessor definitions (/D): add _CRT_SECURE_NO_WARNINGS
   Click finish
   The project should now be ready to build
 
