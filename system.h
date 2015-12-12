@@ -5,11 +5,13 @@
 #include <iomanip>
 #include <map>
 #include <vector>
+#include <ctime>
 #include "data/user.h"
 #include "data/storage.h"
 #include "data/sighting.h"
 #include "data/butterfly.h"
 #include "data/dataFile.h"
+#include "data/reports.h"
 class System{
 private:
 	bool createUser();
@@ -21,7 +23,7 @@ private:
 	void viewUsers();
 	bool deleteAccount();
 	std::string manageSightings(std::string message = "", unsigned int id = 0);
-	void reports();
+	std::string reports();
 	void mainMenu();
 	void clear();
 	void editAccount();

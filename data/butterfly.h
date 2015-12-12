@@ -51,6 +51,7 @@ public:
 	ButterflyData getData();
 	void saveStr(std::ostream& out);
 	std::string getSpecies();
+	bool sameSpecies(const std::string& other);
 	friend std::ostream& operator<<(std::ostream& out, Butterfly& butterfly);
 };
 #endif

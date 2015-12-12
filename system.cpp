@@ -3,7 +3,7 @@
 #include "external/ChrisHash.h"
 #include <iostream>
 #include <fstream>
-std::string System::versionNumber = "Version 0.0.1";
+std::string System::versionNumber = "Version 0.0.2";
 std::string System::programTitle = "Monarchy Butterfly Tracking System";
 void System::start(){
 	/*
@@ -15,7 +15,7 @@ void System::start(){
 }
 bool System::createUser(){
 	std::string pageName = "Create User Account";
-	std::string prompt = programTitle + "\n" + pageName + "\n\n" + "User ID: ";
+	std::string prompt = programTitle + "\n" + pageName + "\n\nEnter Acount Information or \"exit\" to cancel" + "\nUser ID: ";
 	bool validInput = false;
 	bool tagger;
 	std::string name, realName, pwd, address, city, state, zip, cellPhone, homePhone, organization, line;
@@ -24,10 +24,21 @@ bool System::createUser(){
 		clear();
 		std::cout << prompt;
 		std::getline(std::cin, name);
+		if(name.length() == 4 && (name[0] == 'e' || name[0] == 'E') &&
+			(name[1] == 'x' || name[1] == 'X') && (name[2] == 'i' || name[2] == 'I') &&
+			(name[3] == 't' || name[3] == 'T')){
+			loginMenu("Account Creation Cancelled");
+			return false;
+		}
 		validInput = true;
-		validInput = (users.find(name) == users.end());
-		if(!validInput){
-			prompt = programTitle + "\n" + pageName + "\n\n" + "User ID already exists\nUser ID: ";
+		validInput = (name.length() > 0 && users.find(name) == users.end());
+		if(name.length() == 0){
+			validInput = false;
+			prompt = programTitle + "\n" + pageName + "\n\nEnter Account Information or \"exit\" to cancel\n" + "User ID must not be blank.\nUser ID: "; 
+		}
+		else if(users.find(name) != users.end()){
+			validInput = false;
+			prompt = programTitle + "\n" + pageName + "\n\nEnter Account Information or \"exit\" to cancel\n" + "User ID already exists\nUser ID: ";
 		}
 	}
 	std::cout << "Password: ";
@@ -37,12 +48,36 @@ bool System::createUser(){
 	pwd = chrisLibs::sha256(pwd);
 	std::cout << "\nName: ";
 	std::getline(std::cin, realName);
+	if(realName.length() == 4 && (realName[0] == 'e' || realName[0] == 'E') &&
+		(realName[1] == 'x' || realName[1] == 'X') && (realName[2] == 'i' || realName[2] == 'I') &&
+		(realName[3] == 't' || realName[3] == 'T')){
+		loginMenu("Account Creation Cancelled");
+		return false;
+	}
 	std::cout << "Street Address: ";
 	std::getline(std::cin, address);
+	if(address.length() == 4 && (address[0] == 'e' || address[0] == 'E') &&
+		(address[1] == 'x' || address[1] == 'X') && (address[2] == 'i' || address[2] == 'I') &&
+		(address[3] == 't' || address[3] == 'T')){
+		loginMenu("Account Creation Cancelled");
+		return false;
+	}
 	std::cout << "City: ";
 	std::getline(std::cin, city);
+	if(city.length() == 4 && (city[0] == 'e' || city[0] == 'E') &&
+		(city[1] == 'x' || city[1] == 'X') && (city[2] == 'i' || city[2] == 'I') &&
+		(city[3] == 't' || city[3] == 'T')){
+		loginMenu("Account Creation Cancelled");
+		return false;
+	}
 	std::cout << "State: ";
 	std::getline(std::cin, state);
+	if(state.length() == 4 && (state[0] == 'e' || state[0] == 'E') &&
+		(state[1] == 'x' || state[1] == 'X') && (state[2] == 'i' || state[2] == 'I') &&
+		(state[3] == 't' || state[3] == 'T')){
+		loginMenu("Account Creation Cancelled");
+		return false;
+	}
 	prompt = "Zip (##### or #####-####):";
 	validInput = false;
 	while(!validInput){
@@ -50,6 +85,12 @@ bool System::createUser(){
 		std::cout << prompt;
 		prompt = "Invalid Zip\nZip (##### or #####-####): ";
 		std::getline(std::cin, zip);
+		if(zip.length() == 4 && (zip[0] == 'e' || zip[0] == 'E') &&
+			(zip[1] == 'x' || zip[1] == 'X') && (zip[2] == 'i' || zip[2] == 'I') &&
+			(zip[3] == 't' || zip[3] == 'T')){
+			loginMenu("Account Creation Cancelled");
+			return false;
+		}
 		if(!(zip.length() == 5 || zip.length() == 10)){
 			validInput = false;
 			continue;
@@ -77,6 +118,15 @@ bool System::createUser(){
 		std::cout << prompt;
 		prompt = "Invalid Phone Number\nCell Phone (###-###-####): ";
 		std::getline(std::cin, cellPhone);
+		if(cellPhone.length() == 4 && (cellPhone[0] == 'e' || cellPhone[0] == 'E') &&
+			(cellPhone[1] == 'x' || cellPhone[1] == 'X') && (cellPhone[2] == 'i' || cellPhone[2] == 'I') &&
+			(cellPhone[3] == 't' || cellPhone[3] == 'T')){
+			loginMenu("Account Creation Cancelled");
+			return false;
+		}
+		if(cellPhone.length() == 0){
+			continue;
+		}
 		if(cellPhone.length() != 12){
 			validInput = false;
 			continue;
@@ -108,6 +158,15 @@ bool System::createUser(){
 		std::cout << prompt;
 		prompt = "Invalid Phone Number\nHome Phone (###-###-####): ";
 		std::getline(std::cin, homePhone);
+		if(homePhone.length() == 4 && (homePhone[0] == 'e' || homePhone[0] == 'E') &&
+			(homePhone[1] == 'x' || homePhone[1] == 'X') && (homePhone[2] == 'i' || homePhone[2] == 'I') &&
+			(homePhone[3] == 't' || homePhone[3] == 'T')){
+			loginMenu("Account Creation Cancelled");
+			return false;
+		}
+		if(homePhone.length() == 0){
+			continue;
+		}
 		if(homePhone.length() != 12){
 			validInput = false;
 			continue;
@@ -134,8 +193,20 @@ bool System::createUser(){
 	}
 	std::cout << "Organization: ";
 	std::getline(std::cin, organization);
+	if(organization.length() == 4 && (organization[0] == 'e' || organization[0] == 'E') &&
+		(organization[1] == 'x' || organization[1] == 'X') && (organization[2] == 'i' || organization[2] == 'I') &&
+		(organization[3] == 't' || organization[3] == 'T')){
+		loginMenu("Account Creation Cancelled");
+		return false;
+	}
 	std::cout << "Tagger (Y/YES for yes, anything else for no): ";
 	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		loginMenu("Account Creation Cancelled");
+		return false;
+	}
 	if((line.length() == 1 && (line[0] == 'Y' || line[0] == 'y')) ||
 		(line.length() == 3 && (line[0] == 'Y' || line[0] == 'y') &&
 							   (line[1] == 'E' || line[1] == 'e') &&
@@ -148,6 +219,7 @@ bool System::createUser(){
 	users[name] = User(name, pwd, realName, address, city, state, zip, cellPhone, homePhone, organization, tagger);
 	Storage::saveUser(users[name]);
 	loginMenu("Account Created");
+	return true;
 }
 void System::loginMenu(std::string message){
 	std::string prompt = message + "\nEnter choice: ";
@@ -206,7 +278,7 @@ void System::login(std::string message){
 		mainMenu();
 	}
 	else{
-		loginMenu("Invalid Username/Password\n");
+		loginMenu("Invalid Username/Password");
 	}
 	//mainMenu();
 	/*
@@ -282,6 +354,8 @@ std::string System::editSighting(Sighting& sighting){
 	std::string sightTime = ss.str();
 	ss.str(std::string());
 
+	std::time_t epochSec = std::time(NULL);
+	std::tm * curTime = std::localtime(&epochSec);
 	prompt = "Date (Blank to use " + date + ") : ";
 	while(!validInput && !cancelled){	//	Entering Latitude
 		validInput = true;
@@ -369,6 +443,12 @@ std::string System::editSighting(Sighting& sighting){
 						validInput = false;
 						prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
 					}
+				}
+				if(data.year > 1900 + curTime->tm_year ||
+					(data.year == 1900 + curTime->tm_year && data.month > curTime->tm_mon + 1) ||
+					(data.year == 1900 + curTime->tm_year && data.month == curTime->tm_mon + 1 && data.day > curTime->tm_mday)){
+					validInput = false;
+					prompt = "The date cannot be in the future\nDate (YYYY-MM-DD): ";
 				}
 			}
 			else{
@@ -562,49 +642,73 @@ std::string System::editSighting(Sighting& sighting){
 	else{
 		data.country = line;
 	}
-	prompt = "Species (Blank to use " + data.species + "): ";
-	while(!validInput && !cancelled){	//	Entering Longitude
-		std::cout << prompt;
-		std::getline(std::cin, line);
-		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
-			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
-			(line[3] == 't' || line[3] == 'T')){
-			return "Sighting update cancelled!";
+	std::map<std::string, Butterfly>::iterator tagIter;
+	if(data.tagNum.length() == 0){
+		prompt = "Species (Blank to use " + data.species + "): ";
+		while(!validInput && !cancelled){	//	Entering Longitude
+			std::cout << prompt;
+			std::getline(std::cin, line);
+			if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+				(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+				(line[3] == 't' || line[3] == 'T')){
+				return "Sighting update cancelled!";
+			}
+			else if(line.length() > 0){
+				data.species = line;
+				prompt = "Species cannot be blank, please try again: ";
+			}
+			else{
+				validInput = true;
+			}
 		}
-		else if(line.length() > 0){
-			data.species = line;
-			prompt = "Species cannot be blank, please try again: ";
-		}
-		else{
-			validInput = true;
-		}
-	}
-	validInput = false;
-	if(data.tagNum.length() > 0){
-		prompt = "Tag Number (Blank to use " + data.tagNum + "): ";
-	}
-	else{
-		prompt = "Tag Number (Blank for none): ";
-	}
-	while(!validInput && !cancelled){	//	Entering Longitude
-		std::cout << prompt;
-		std::getline(std::cin, line);
-		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
-			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
-			(line[3] == 't' || line[3] == 'T')){
-			return "Sighting update cancelled!";
-		}
-		else if(line.length() > 0){
-			validInput = true;	//	TODO: Change this when we have tag database
-			data.tagNum = line;
-			prompt = "Tag number exists for another species already, Try another: ";
+		validInput = false;
+		if(data.tagNum.length() > 0){
+			prompt = "Tag Number (Blank to use " + data.tagNum + "): ";
 		}
 		else{
-			validInput = true;
+			prompt = "Tag Number (Blank for none): ";
 		}
-	}
-	if(cancelled){
-		return "Sighting update cancelled!";
+		while(!validInput && !cancelled){	//	Entering Longitude
+			std::cout << prompt;
+			std::getline(std::cin, line);
+			if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+				(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+				(line[3] == 't' || line[3] == 'T')){
+				return "Sighting update cancelled!";
+			}
+			else if(line.length() > 0){
+				tagIter = tags.find(line);
+				if(tagIter == tags.end()){
+					if(users[currentUser].canTag()){
+						validInput = true;
+						data.tagNum = line;
+						tags[data.tagNum] = Butterfly(currentUser, data.tagNum, data.species, data.city, data.state, data.country,
+													  data.day, data.month, data.year, data.hour, data.minute, data.second, data.latitude, data.longitude);
+
+					}
+					else{
+						validInput = false;
+						prompt = "You are not a registered tagger and this tag is not yet in use.\nTag Number (Blank for none): ";
+					}
+				}
+				else{
+					if(tagIter->second.sameSpecies(data.species)){
+						validInput = true;
+						data.tagNum = line;
+					}
+					else{
+						validInput = false;
+						prompt = "This tag number is assigned to a different species already\nTag Number (Blank for none): ";
+					}
+				}
+			}
+			else{
+				validInput = true;
+			}
+		}
+		if(cancelled){
+			return "Sighting update cancelled!";
+		}
 	}
 	sightings[data.id].update(data);
 	//	Update other maps based on new data
@@ -669,6 +773,8 @@ std::string System::createSighting(){
 	std::cout << programTitle << "\n" << "Create Sighting\n\n";
 	std::cout << "Enter sighting data, or \"exit\" to cancel.\n\n";
 
+	std::time_t epochSec = std::time(NULL);
+	std::tm * curTime = std::localtime(&epochSec);
 	prompt = "Date (YYYY-MM-DD): ";
 	while(!validInput && !cancelled){	//	Entering Latitude
 		validInput = true;
@@ -753,6 +859,12 @@ std::string System::createSighting(){
 						validInput = false;
 						prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
 					}
+				}
+				if(data.year > 1900 + curTime->tm_year ||
+					(data.year == 1900 + curTime->tm_year && data.month > curTime->tm_mon + 1) ||
+					(data.year == 1900 + curTime->tm_year && data.month == curTime->tm_mon + 1 && data.day > curTime->tm_mday)){
+					validInput = false;
+					prompt = "The date cannot be in the future\nDate (YYYY-MM-DD): ";
 				}
 			}
 			else{
@@ -966,7 +1078,7 @@ std::string System::createSighting(){
 				}
 			}
 			else{
-				if(data.species.compare(tagIter->second.getSpecies()) == 0){
+				if(tagIter->second.sameSpecies(data.species)){
 					validInput = true;
 				}
 				else{
@@ -1202,23 +1314,22 @@ std::string System::manageSightings(std::string message, unsigned int id){
 	return "Sighting " + line + " update successful!";
 
 }
-void System::reports(){
+std::string System::reports(){
 	/*
 		Handles generating reports
 	*/
 	std::string line = "";
 	std::string prompt = "\nEnter Selection: ";
-	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '7')){
+	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '6')){
 		clear();
 		std::cout << programTitle << "\n";
 		std::cout << "Reports Menu:\n\n"
 				  << "1. Hotspot Report\n"
 				  << "2. Migration Report\n"
-				  << "3. Frequency Report\n"
-				  << "4. User Rankings Report\n"
-				  << "5. Species Location Report\n"
-				  << "6. Butterfly Sighting History\n"
-				  << "7. Exit\n";
+				  << "3. User Rankings Report\n"
+				  << "4. Species Location Report\n"
+				  << "5. Butterfly Sighting History\n"
+				  << "6. Exit\n";
 		std::cout << prompt;
 		std::getline(std::cin, line);
 		prompt = "\nInvalid Selection\nEnter Selection: ";
@@ -1226,27 +1337,24 @@ void System::reports(){
 	std::cout << "\n\n\n";
 	switch(line[0]){
 		case '1':
-			std::cout << "Hotspot Report stuff ";
+			return Reports::hotspot(sightings);
 			break;
 		case '2':
-			std::cout << "Migration Report stuff ";
+			return Reports::migration(dateSightings, tags);
 			break;
 		case '3':
-			std::cout << "Frequency Report stuff ";
+			return Reports::userRankings(userSightings, users, currentUser);
 			break;
 		case '4':
-			std::cout << "User Rankings Report stuff ";
+			return Reports::speciesLocation(sightings);
 			break;
 		case '5':
-			std::cout << "Species Location Report stuff ";
+			return Reports::sightingHistory(dateSightings);
 			break;
 		case '6':
-			std::cout << "Butterfly Sighting History stuff ";
+			return "";
 			break;
 	};
-	if(line[0] != '7'){
-		std::getline(std::cin, line);
-	}
 }
 void System::clear(){
 	/*
@@ -1466,7 +1574,7 @@ void System::mainMenu(){
 					prompt = createSighting() + '\n' + prompt;
 					break;
 				case '4':
-					reports();
+					prompt = reports() + '\n' + prompt;
 					break;
 				case '5':
 					prompt = importExport() + '\n' + prompt;

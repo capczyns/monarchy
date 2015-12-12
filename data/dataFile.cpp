@@ -204,6 +204,8 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 	Sighting sight;
 
 
+	std::time_t epochSec = std::time(NULL);
+	std::tm * curTime = std::localtime(&epochSec);
 	std::stringstream ss;
 	if(inFile.is_open()){
 		std::getline(inFile, hd);
@@ -312,6 +314,12 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 						addError(errors, "Invalid day");
 						continue;
 					}
+				}
+				if(sighting.year > 1900 + curTime->tm_year ||
+					(sighting.year == 1900 + curTime->tm_year && sighting.month > curTime->tm_mon + 1) ||
+					(sighting.year == 1900 + curTime->tm_year && sighting.month == curTime->tm_mon + 1 && sighting.day > curTime->tm_mday)){
+					addError(errors, "Future date");
+					continue;
 				}
 				//	Date is valid up to this point
 
@@ -574,6 +582,8 @@ unsigned int DataFile::parseHeader(std::string& header){
 	std::string year = "";
 	std::string month = "";
 	std::string day = "";
+	std::time_t epochSec = std::time(NULL);
+	std::tm * curTime = std::localtime(&epochSec);
 
 	int index = 0;
 	while(index < header.length() && header[index] != ' '){

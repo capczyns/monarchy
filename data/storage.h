@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <iostream>
 #include "user.h"
 #include "sighting.h"
 #include "butterfly.h"
