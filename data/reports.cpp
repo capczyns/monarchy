@@ -41,6 +41,11 @@ std::string Reports::hotspot(std::map<unsigned int, Sighting>& sightings){
 		valid = true;
 		dotFound = false;
 		signFound = false;
+		if(line.length() < 1){
+			valid = false;
+			prompt = "Latitude must not be blank\nEnter latitude: ";
+			continue;
+		}
 		for(int index = 0; valid && index < line.length(); ++index){
 			if(line[index] == '+' || line[index] == '-'){
 				if(!signFound){
@@ -48,7 +53,7 @@ std::string Reports::hotspot(std::map<unsigned int, Sighting>& sightings){
 				}
 				else{
 					valid = false;
-					prompt = "Longitude must be a number.\nEnter latitude: ";
+					prompt = "Latitude must be a number.\nEnter latitude: ";
 				}
 			}
 			else if(line[index] == '.'){
@@ -57,7 +62,7 @@ std::string Reports::hotspot(std::map<unsigned int, Sighting>& sightings){
 				}
 				else{
 					valid = false;
-					prompt = "Longitude must be a number.\nEnter latitude: ";
+					prompt = "Latitude must be a number.\nEnter latitude: ";
 				}
 			}
 			else if(!(line[index] >= '0' && line[index] <= '9')){
@@ -88,6 +93,11 @@ std::string Reports::hotspot(std::map<unsigned int, Sighting>& sightings){
 		valid = true;
 		dotFound = false;
 		signFound = false;
+		if(line.length() < 1){
+			valid = false;
+			prompt = "Longitude must not be blank.\nEnter longitude: ";
+			continue;
+		}
 		for(int index = 0; valid && index < line.length(); ++index){
 			if(line[index] == '+' || line[index] == '-'){
 				if(!signFound){
@@ -123,7 +133,7 @@ std::string Reports::hotspot(std::map<unsigned int, Sighting>& sightings){
 		}
 	}
 	valid = false;
-	prompt = "\nEnter radius: ";
+	prompt = "\nEnter radius (miles): ";
 	while(!valid){
 		std::cout << prompt;
 		std::getline(std::cin, line);
@@ -157,6 +167,10 @@ std::string Reports::hotspot(std::map<unsigned int, Sighting>& sightings){
 		if(distance < 1){
 			valid = false;
 			prompt = "Radius must be greater than 0.\nEnter radius (miles): ";
+		}
+		if(distance > 1300){
+			valid = false;
+			prompt = "Radius must be less than 1300 (roughly half the circumference of Earth in miles)\nEnter radius (miles): ";
 		}
 	}
 
@@ -205,9 +219,10 @@ std::string Reports::migration(std::map<std::string, std::vector<Sighting*> >& d
 	std::map<std::string, SightingData>:: iterator timeIter;
 	unsigned int numShown = 0;
 	bool validInput = false;
+	unsigned int totalSightings = 0;
 
 
-	std::string prompt = "Monarchy Butterfly Tracking System\nMigration Report\n\nEnter Tag Number (\"exit\" to cancel): ";
+	std::string prompt = "Monarchy Butterfly Tracking System\nMigration Report\n\nEnter Tag ID (\"exit\" to cancel): ";
 	while(!validInput){
 		std::cout << std::string(100,'\n');
 		std::cout << prompt;
@@ -220,13 +235,31 @@ std::string Reports::migration(std::map<std::string, std::vector<Sighting*> >& d
 		validInput = true;
 		if(tagNum.length() == 0){
 			validInput = false;
-			prompt = "Monarchy Butterfly Tracking System\nMigration Report\n\nTag Number Required.\nEnter Tag Number (\"exit\" to cancel): ";
+			prompt = "Monarchy Butterfly Tracking System\nMigration Report\n\nTag ID Required.\nEnter Tag ID (\"exit\" to cancel): ";
 		}
 		else if(tags.find(tagNum) == tags.end()){
 			validInput = false;
-			prompt = "Monarchy Butterfly Tracking System\nMigration Report\n\nTag Not Found\nEnter Tag Number (\"exit\" to cancel): ";
+			prompt = "Monarchy Butterfly Tracking System\nMigration Report\n\nTag Not Found\nEnter Tag ID (\"exit\" to cancel): ";
 		}
 	}
+	std::cout << "\n\n";
+	while(dateIter != dateSightings.end()){
+		for(int index = 0; index < dateIter->second.size(); ++index){
+			data = dateIter->second[index]->getData();
+			if(data.tagNum.compare(tagNum) == 0){
+				++totalSightings;
+				if(data.cityStr().find_first_not_of(' ') != std::string::npos){
+					incrementFrequency(frequency, data.cityStr());
+					if(frequency[data.cityStr()] > mostVisitNum){
+						mostVisitNum = frequency[data.cityStr()];
+						mostVisited = data;
+					}
+				}
+			}
+		}
+		++dateIter;
+	}
+	dateIter = dateSightings.begin();
 	while(dateIter != dateSightings.end()){
 		timeSightings.clear();
 		for(int index = 0; index < dateIter->second.size(); ++index){
@@ -262,12 +295,7 @@ std::string Reports::migration(std::map<std::string, std::vector<Sighting*> >& d
 			}
 			std::cout << "Distance since last known location: " << distance << " miles\n";
 			if(data.cityStr().find_first_not_of(' ') != std::string::npos){
-				incrementFrequency(frequency, data.cityStr());
-				if(frequency[data.cityStr()] > mostVisitNum){
-					mostVisitNum = frequency[data.cityStr()];
-					mostVisited = data;
-				}
-				std::cout << "Frequency found in this city: " << frequency[data.cityStr()] << " of " << numShown + 1 << " sightings.\n";
+				std::cout << "Frequency found in this city: " << frequency[data.cityStr()] << " of " << totalSightings << " sightings.\n";
 			}
 			std::cout << std::endl << std::endl;
 			if(++numShown % 4 == 0){
@@ -287,7 +315,7 @@ std::string Reports::migration(std::map<std::string, std::vector<Sighting*> >& d
 		std::cout <<"\nTotal recorded distance: " << totalDistance << " miles.";
 	if(mostVisitNum > 0)
 		std::cout << "\nMost visited city: " << mostVisited.city << ", " << mostVisited.state << ", " << mostVisited.country << " with " << 
-					mostVisitNum << " visits out of " << numShown << " sightings.";
+					mostVisitNum << " visits out of " << totalSightings << " sightings.";
 	std::cout << "\n\nPress enter to continue: ";
 	std::getline(std::cin, line);
 	return "Migration Report Completed";
@@ -299,6 +327,7 @@ void Reports::incrementFrequency(std::map<std::string, unsigned int>& frequency,
 	++frequency[location];
 }
 std::string Reports::userRankings(std::map<std::string, std::vector<Sighting*> >& userSightings, std::map<std::string, User>& users, std::string currentUser){
+	std::cout << std::string(100,'\n');
 	std::cout << "Monarchy Butterfly Tracking System\nUser Rankings:\n\n1 point per sighting, 5 points per different location.\n\n";
 	unsigned int first = 0, second = 0, third = 0, user = 0, current = 0;
 	unsigned int sfirst, ssecond, sthird, suser, scurrent;
@@ -369,13 +398,13 @@ std::string Reports::userRankings(std::map<std::string, std::vector<Sighting*> >
 	}
 	std::cout << "\n";
 	if(first > 0){
-		std::cout << "1st Place: " << user1 << " with " << first << " points - " << sfirst << " sightings in " << (first - sfirst) / 5 << " different locations.\n";
+		std::cout << "1st Place: " << user1 << "\n " << first << " points - " << sfirst << " sightings in " << (first - sfirst) / 5 << " different locations.\n\n";
 	}
 	if(second > 0){
-		std::cout << "2nd Place: " << user2 << " with " << second << " points - " << ssecond << " sightings in " << (second -ssecond) / 5 << " different locations.\n";
+		std::cout << "2nd Place: " << user2 << "\n " << second << " points - " << ssecond << " sightings in " << (second -ssecond) / 5 << " different locations.\n\n";
 	}
 	if(third > 0){
-		std::cout << "3rd Place: " << user3 << " with " << third << " points - " << sthird << " sightings in " << (third - sthird) / 5 << " different locations.\n";
+		std::cout << "3rd Place: " << user3 << "\n " << third << " points - " << sthird << " sightings in " << (third - sthird) / 5 << " different locations.\n\n";
 	}
 	if(user > 0){
 		std::cout << "\nYour score: " << user << " points - " << suser << " sightings in " << (user - suser) / 5 << " different locations.\n";
@@ -418,7 +447,6 @@ std::string Reports::speciesLocation(std::map<unsigned int, Sighting>& sightings
 			if(iter->second.sameSpecies(species)){
 				data = iter->second.getData();
 				if(data.city.length() > 0){
-					std::cout << ++counter << std::endl;
 					current = data.cityStr();
 					currentShort = data.city + ", " + data.state + ", " + data.country;
 					if(locationsFound.find(current) == locationsFound.end()){
@@ -449,10 +477,10 @@ std::string Reports::speciesLocation(std::map<unsigned int, Sighting>& sightings
 					}
 				}
 			}
-			if(locationsFound.size() < 1){
-				valid = false;
-				prompt = "Monarchy Butterfly Tracking System\nSpecies Location Report:\n\nSpecies not found.\nEnter Species or \"exit\" to cancel: ";
-			}
+		}
+		if(locationsFound.size() < 1){
+			valid = false;
+			prompt = "Monarchy Butterfly Tracking System\nSpecies Location Report:\n\nSpecies not found.\nEnter Species or \"exit\" to cancel: ";
 		}
 	}
 	std::cout << "Best locations to find " << species << " butterflies:\n";

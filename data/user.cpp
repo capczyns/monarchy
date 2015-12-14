@@ -68,9 +68,51 @@ std::string User::getOrganization(){
 	return organization;
 }
 std::ostream& operator<<(std::ostream& out, const User& user){
-	out <<"Username: " << user.name << "     Name: " << user.realName << "     Organization: " << user.organization << std::endl;
-	out << "Address: " << user.address << ", " << user.city << ", " << user.state << " " << user.zip << std::endl;
-	out << "Cell #: " << user.cellPhone << "     Home #: " << user.homePhone << std::endl;
+	out <<"Username: " << user.name << "     Name: ";
+	if(user.realName.length() == 0){
+		out << "Unlisted";
+	}
+	else
+		out << user.realName;
+
+	out << "     Organization: ";
+	if(user.organization.length() == 0)
+		out << "Unlisted";
+	else
+		out << user.organization << std::endl;
+
+	out << "Address: ";
+	if(user.address.length() == 0)
+		out << "Unlisted Address,";
+	else
+		out << user.address << ", ";
+
+	if(user.city.length() ==0)
+		out << "Unlisted City,";
+	else
+		out << user.city << ", ";
+
+	if(user.state.length() == 0)
+		out << "Unlisted State,";
+	else
+		out << user.state << " ";
+
+	if(user.zip.length() == 0)
+		out << "Unlisted Zip";
+	else
+		out << user.zip << std::endl;
+
+	out << "Cell #: ";
+	if(user.cellPhone.length() == 0)
+		out << "Unlisted";
+	else
+		out << user.cellPhone;
+
+	out << "     Home #: ";
+	if(user.homePhone.length() == 0)
+		out << "Unlisted";
+	else
+		out << user.homePhone << std::endl;
 	return out;
 }
 bool User::canLogin(){

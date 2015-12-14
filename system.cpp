@@ -3,7 +3,7 @@
 #include "external/ChrisHash.h"
 #include <iostream>
 #include <fstream>
-std::string System::versionNumber = "Version 0.0.2";
+std::string System::versionNumber = "Version 0.0.3";
 std::string System::programTitle = "Monarchy Butterfly Tracking System";
 void System::start(){
 	/*
@@ -41,12 +41,24 @@ bool System::createUser(){
 			prompt = programTitle + "\n" + pageName + "\n\nEnter Account Information or \"exit\" to cancel\n" + "User ID already exists\nUser ID: ";
 		}
 	}
-	std::cout << "Password: ";
-	chrisLibs::echo(false);
-	std::getline(std::cin, pwd);
-	chrisLibs::echo(true);
+	validInput = false;
+	prompt = "Password: ";
+	while(!validInput){
+		std::cout << prompt;
+		chrisLibs::echo(false);
+		std::getline(std::cin, pwd);
+		chrisLibs::echo(true);
+		if(pwd.length() == 4 && (pwd[0] == 'e' || pwd[0] == 'E') &&
+			(pwd[1] == 'x' || pwd[1] == 'X') && (pwd[2] == 'i' || pwd[2] == 'I') &&
+			(pwd[3] == 't' || pwd[3] == 'T')){
+			loginMenu("Account Creation Cancelled");
+			return false;
+		}
+		validInput = pwd.length() > 0;
+		prompt = "\nPassword must not be empty\nPassword: ";
+	}
 	pwd = chrisLibs::sha256(pwd);
-	std::cout << "\nName: ";
+	std::cout << "Name: ";
 	std::getline(std::cin, realName);
 	if(realName.length() == 4 && (realName[0] == 'e' || realName[0] == 'E') &&
 		(realName[1] == 'x' || realName[1] == 'X') && (realName[2] == 'i' || realName[2] == 'I') &&
@@ -90,6 +102,9 @@ bool System::createUser(){
 			(zip[3] == 't' || zip[3] == 'T')){
 			loginMenu("Account Creation Cancelled");
 			return false;
+		}
+		if(zip.length() == 0){
+			continue;
 		}
 		if(!(zip.length() == 5 || zip.length() == 10)){
 			validInput = false;
@@ -224,14 +239,14 @@ bool System::createUser(){
 void System::loginMenu(std::string message){
 	std::string prompt = message + "\nEnter choice: ";
 	std::string line = "";
-	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
+	while(line.length() < 1 || !(line[0] >= '0' && line[0] <= '2')){
 		clear();
 		std::cout << programTitle << '\n'
 				  << versionNumber << '\n'
 				  << "Login Menu:\n\n"
 				  << "1. Login\n"
 				  << "2. Create Account\n"
-				  << "3. Quit\n\n";
+				  << "0. Exit\n\n";
 
 		std::cout << prompt;
 		std::getline(std::cin, line);
@@ -242,7 +257,7 @@ void System::loginMenu(std::string message){
 			case '2':
 				createUser();
 				break;
-			case '3':
+			case '0':
 				std::cout << "Goodbye\n";
 		};
 		prompt = "Invalid Option\nEnter choice: ";
@@ -298,13 +313,13 @@ std::string System::importExport(){
 	std::string line = "";
 	std::string path = "";
 	std::string prompt = "\nChoose option: ";
-	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
+	while(line.length() < 1 || !(line[0] >= '0' && line[0] <= '2')){
 		clear();
 		std::cout << programTitle << '\n'
 				  << "Import/Export Menu:\n"
 				  << "1. Import\n"
 				  << "2. Export\n"
-				  << "3. Cancel\n";
+				  << "0. Exit\n";
 		std::cout << prompt;
 		std::getline(std::cin, line);
 		prompt = "\nInvalid option\nChoose option: ";
@@ -342,7 +357,7 @@ std::string System::editSighting(Sighting& sighting){
 	std::string prompt;
 	std::cout << programTitle << "\nEdit Sighting\n\n";
 	std::cout << sighting << "\n\n";
-	std::cout << "Enter sighting data, or \"exit\" to cancel.\nLeave blank to use original value\n\n";
+	std::cout << "Enter sighting data, or \"exit\" to cancel.\nPress Enter to use original value\n\n";
 
 	std::string date;
 	std::stringstream ss;
@@ -356,7 +371,7 @@ std::string System::editSighting(Sighting& sighting){
 
 	std::time_t epochSec = std::time(NULL);
 	std::tm * curTime = std::localtime(&epochSec);
-	prompt = "Date (Blank to use " + date + ") : ";
+	prompt = "Date (Enter to use " + date + ") : ";
 	while(!validInput && !cancelled){	//	Entering Latitude
 		validInput = true;
 		std::cout << prompt;
@@ -424,24 +439,24 @@ std::string System::editSighting(Sighting& sighting){
 				ss >> data.day;
 				//data.day = std::stoi(temp);
 				if(data.day < 1 || data.day > 31){
-					prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
+					prompt = "Day must be between 1 and 31\nDate (YYYY-MM-DD): ";
 					validInput = false;
 				}
 				else{
 					if(data.month == 2){
 						if(data.day > 29){
 							validInput = false;
-							prompt = "Wrong number of days (February)\nDate (YYYY-MM-DD): ";
+							prompt = "Day must be between 1 and 29 (February)\nDate (YYYY-MM-DD): ";
 						}
-						if(data.year % 4 == 0 && data.day > 28){
+						if(data.year % 4 != 0 && data.day > 28){
 							validInput = false;
-							prompt = "Wrong number of days (February in Leap Year)\nDate (YYYY-MM-DD): ";
+							prompt = "Day must be between 1 and 28 (February not in leap year)\nDate (YYYY-MM-DD): ";
 						}
 					}
 					else if((data.month == 4 || data.month == 6 || data.month == 9 ||
 							 data.month == 11) && data.day > 30){
 						validInput = false;
-						prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
+						prompt = "Day must be between 1 and 30\nDate (YYYY-MM-DD): ";
 					}
 				}
 				if(data.year > 1900 + curTime->tm_year ||
@@ -449,6 +464,10 @@ std::string System::editSighting(Sighting& sighting){
 					(data.year == 1900 + curTime->tm_year && data.month == curTime->tm_mon + 1 && data.day > curTime->tm_mday)){
 					validInput = false;
 					prompt = "The date cannot be in the future\nDate (YYYY-MM-DD): ";
+				}
+				if(data.year < 1900){
+					validInput = false;
+					prompt = "The date cannot be before 1900.\nDate (YYYY-MM-DD): ";
 				}
 			}
 			else{
@@ -461,7 +480,7 @@ std::string System::editSighting(Sighting& sighting){
 			prompt = "Please use correct format (YYYY-MM-DD): ";
 		}
 	}
-	prompt = "Time (Blank to use " + sightTime + ") : ";
+	prompt = "Time (Enter to use " + sightTime + ") : ";
 	validInput = false;
 	while(!validInput && !cancelled){	//	Entering Latitude
 		validInput = true;
@@ -552,7 +571,7 @@ std::string System::editSighting(Sighting& sighting){
 	}
 	ss << data.latitude;
 	temp = ss.str();
-	prompt = "Latitude (Blank to use " + temp + "): ";
+	prompt = "Latitude (Enter to use " + temp + "): ";
 	validInput = false;
 	while(!validInput && !cancelled){	//	Entering Latitude
 		std::cout << prompt;
@@ -587,7 +606,7 @@ std::string System::editSighting(Sighting& sighting){
 	}
 	ss << data.longitude;
 	temp = ss.str();
-	prompt = "Longitude (Blank to use " + temp + "): ";
+	prompt = "Longitude (Enter to use " + temp + "): ";
 	while(!validInput && !cancelled){	//	Entering Longitude
 		std::cout << prompt;
 		std::getline(std::cin, line);
@@ -612,7 +631,7 @@ std::string System::editSighting(Sighting& sighting){
 		}
 	}
 	validInput = false;
-	std::cout << "City (Blank to use " + data.city + "): ";
+	std::cout << "City (Enter to use " + data.city + "): ";
 	std::getline(std::cin, line);
 	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
 		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
@@ -622,7 +641,7 @@ std::string System::editSighting(Sighting& sighting){
 	else if(line.length() > 0){
 		data.city = line;
 	}
-	std::cout << "State/Province (Blank to use " + data.state + "): ";
+	std::cout << "State/Province (Enter to use " + data.state + "): ";
 	std::getline(std::cin, line);
 	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
 		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
@@ -632,7 +651,7 @@ std::string System::editSighting(Sighting& sighting){
 	else if(line.length() > 0){
 		data.state = line;
 	}
-	std::cout << "Country (Blank to use " + data.country + "): ";
+	std::cout << "Country (Enter to use " + data.country + "): ";
 	std::getline(std::cin, line);
 	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
 		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
@@ -644,7 +663,7 @@ std::string System::editSighting(Sighting& sighting){
 	}
 	std::map<std::string, Butterfly>::iterator tagIter;
 	if(data.tagNum.length() == 0){
-		prompt = "Species (Blank to use " + data.species + "): ";
+		prompt = "Species (Enter to use " + data.species + "): ";
 		while(!validInput && !cancelled){	//	Entering Longitude
 			std::cout << prompt;
 			std::getline(std::cin, line);
@@ -655,7 +674,7 @@ std::string System::editSighting(Sighting& sighting){
 			}
 			else if(line.length() > 0){
 				data.species = line;
-				prompt = "Species cannot be blank, please try again: ";
+				validInput = true;
 			}
 			else{
 				validInput = true;
@@ -663,10 +682,10 @@ std::string System::editSighting(Sighting& sighting){
 		}
 		validInput = false;
 		if(data.tagNum.length() > 0){
-			prompt = "Tag Number (Blank to use " + data.tagNum + "): ";
+			prompt = "Tag ID (Enter to use " + data.tagNum + "): ";
 		}
 		else{
-			prompt = "Tag Number (Blank for none): ";
+			prompt = "Tag ID (Enter for none): ";
 		}
 		while(!validInput && !cancelled){	//	Entering Longitude
 			std::cout << prompt;
@@ -688,7 +707,12 @@ std::string System::editSighting(Sighting& sighting){
 					}
 					else{
 						validInput = false;
-						prompt = "You are not a registered tagger and this tag is not yet in use.\nTag Number (Blank for none): ";
+						if(data.tagNum.length() > 0){
+							prompt = "You are not a registered tagger and this tag is not yet in use.\nTag ID (Enter to use " + data.tagNum + "): ";
+						}
+						else{
+							prompt = "You are not a registered tagger and this tag is not yet in use.\nTag ID (Enter for none): ";
+						}
 					}
 				}
 				else{
@@ -698,7 +722,12 @@ std::string System::editSighting(Sighting& sighting){
 					}
 					else{
 						validInput = false;
-						prompt = "This tag number is assigned to a different species already\nTag Number (Blank for none): ";
+						if(data.tagNum.length() > 0){
+							prompt = "You are not a registered tagger and this tag is not yet in use.\nTag ID (Enter to use " + data.tagNum + "): ";
+						}
+						else{
+							prompt = "You are not a registered tagger and this tag is not yet in use.\nTag ID (Enter for none): ";
+						}
 					}
 				}
 			}
@@ -847,17 +876,17 @@ std::string System::createSighting(){
 					if(data.month == 2){
 						if(data.day > 29){
 							validInput = false;
-							prompt = "Wrong number of days (February)\nDate (YYYY-MM-DD): ";
+							prompt = "Day must be between 1 and 29 (February)\nDate (YYYY-MM-DD): ";
 						}
 						if(data.year % 4 == 0 && data.day > 28){
 							validInput = false;
-							prompt = "Wrong number of days (February in Leap Year)\nDate (YYYY-MM-DD): ";
+							prompt = "Day must be between 1 and 28 (February not in leap year)\nDate (YYYY-MM-DD): ";
 						}
 					}
 					else if((data.month == 4 || data.month == 6 || data.month == 9 ||
 							 data.month == 11) && data.day > 30){
 						validInput = false;
-						prompt = "Wrong number of days\nDate (YYYY-MM-DD): ";
+						prompt = "Day must be between \nDate (YYYY-MM-DD): ";
 					}
 				}
 				if(data.year > 1900 + curTime->tm_year ||
@@ -865,6 +894,10 @@ std::string System::createSighting(){
 					(data.year == 1900 + curTime->tm_year && data.month == curTime->tm_mon + 1 && data.day > curTime->tm_mday)){
 					validInput = false;
 					prompt = "The date cannot be in the future\nDate (YYYY-MM-DD): ";
+				}
+				if(data.year < 1900){
+					validInput = false;
+					prompt = "The date cannot be before 1900.\nDate (YYYY-MM-DD): ";
 				}
 			}
 			else{
@@ -1047,7 +1080,7 @@ std::string System::createSighting(){
 		}
 	}
 	validInput = false;
-	prompt = "Tag Number (Blank for none): ";
+	prompt = "Tag ID (Enter for none): ";
 
 	std::map<std::string, Butterfly>::iterator tagIter;
 	while(!validInput && !cancelled){	//	Entering Longitude
@@ -1074,7 +1107,7 @@ std::string System::createSighting(){
 				}
 				else{
 					validInput = false;
-					prompt = "You are not a registered tagger and this tag is not yet in use.\nTag Number (Blank for none): ";
+					prompt = "You are not a registered tagger and this tag is not yet in use.\nTag ID (Enter for none): ";
 				}
 			}
 			else{
@@ -1083,7 +1116,7 @@ std::string System::createSighting(){
 				}
 				else{
 					validInput = false;
-					prompt = "This tag number is assigned to a different species already\nTag Number (Blank for none): ";
+					prompt = "This tag number is assigned to a different species already\nTag ID (Enter for none): ";
 				}
 			}
 		}
@@ -1207,14 +1240,14 @@ std::string System::manageSightings(std::string message, unsigned int id){
 	}
 	prompt = message + "\nChoose option: ";
 	line = "";
-	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '3')){
+	while(line.length() < 1 || !(line[0] >= '0' && line[0] <= '2')){
 		clear();
 		std::cout << programTitle << "\n";
 		std::cout << iter->second;
 		std::cout << "\n\nManage Sightings Menu:\n"
 				  << "1. Update\n"
 				  << "2. Delete\n"
-				  << "3. Cancel\n";
+				  << "0. Cancel\n";
 		std::cout << prompt;
 		std::getline(std::cin, line);
 		prompt = "\nInvalid option\nChoose option: ";
@@ -1320,7 +1353,7 @@ std::string System::reports(){
 	*/
 	std::string line = "";
 	std::string prompt = "\nEnter Selection: ";
-	while(line.length() < 1 || !(line[0] >= '1' && line[0] <= '6')){
+	while(line.length() < 1 || !(line[0] >= '0' && line[0] <= '5')){
 		clear();
 		std::cout << programTitle << "\n";
 		std::cout << "Reports Menu:\n\n"
@@ -1329,7 +1362,7 @@ std::string System::reports(){
 				  << "3. User Rankings Report\n"
 				  << "4. Species Location Report\n"
 				  << "5. Butterfly Sighting History\n"
-				  << "6. Exit\n";
+				  << "0. Exit\n";
 		std::cout << prompt;
 		std::getline(std::cin, line);
 		prompt = "\nInvalid Selection\nEnter Selection: ";
@@ -1351,7 +1384,7 @@ std::string System::reports(){
 		case '5':
 			return Reports::sightingHistory(dateSightings);
 			break;
-		case '6':
+		case '0':
 			return "";
 			break;
 	};
@@ -1362,7 +1395,7 @@ void System::clear(){
 	*/
 		std::cout << std::string(100, '\n') << std::endl;
 }
-void System::editAccount(){
+bool System::editAccount(){
 	std::string line = "";
 	std::string realName = users[currentUser].getRealName();
 	std::string address = users[currentUser].getAddress();
@@ -1378,48 +1411,77 @@ void System::editAccount(){
 	bool tagger;
 	clear();
 	std::cout << programTitle << "\nEdit Account\n\n";
-	std::cout << "Name (Blank to use " + realName + "): ";
+	if(realName.length() > 0)
+		std::cout << "Name (Blank to use \"" << realName << "\"): ";
+	else
+		std::cout << "Name: ";
 	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return false;
+	}
 	if(line.length()> 0){
 		realName = line;
 	}
-	std::cout << "Street Address (Blank to use " + address + "): ";
+	if(address.length() > 0)
+		std::cout << "Street Address (Blank to use \"" << address << "\"): ";
+	else
+		std::cout << "Street Address: ";
 	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return false;
+	}
 	if(line.length() > 0){
 		address = line;
 	}
-	std::cout << "City (Blank to use " + city + "): ";
+	if(city.length() > 0)
+		std::cout << "City (Blank to use \"" << city << "\"): ";
+	else
+		std::cout << "City: ";
 	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return false;
+	}
 	if(line.length() > 0){
 		city = line;
 	}
-	std::cout << "State (Blank to use " + state + "): ";
+	if(state.length() > 0)
+		std::cout << "State (Blank to use \"" << state << "\"): ";
+	else
+		std::cout << "State: ";
 	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return false;
+	}
 	if(line.length() > 0){
 		state = line;
 	}
-	std::cout << "Zip (Blank to use " + zip + "): ";
-	std::getline(std::cin, line);
-	if(line.length() > 0){
-		zip = line;
-	}
-	std::cout << "Home Phone (Blank to use " + homePhone + "): ";
-	std::getline(std::cin, line);
-	if(line.length() > 0){
-		homePhone = line;
-	}
-	std::cout << "Cell Phone (Blank to use " + cellPhone + "): ";
-	std::getline(std::cin, line);
-	if(line.length() > 0){
-		cellPhone = line;
-	}
-	prompt = "Zip (##### or #####-####):";
+	if(zip.length() > 0)
+		prompt = "Zip (Blank to use \"" + zip + "\"): ";
+	else
+		prompt = "Zip (##### or #####-####):";
 	validInput = false;
 	while(!validInput){
 		validInput = true;
 		std::cout << prompt;
-		prompt = "Invalid Zip\nZip (##### or #####-####): ";
+		if(zip.length() > 0)
+			prompt = "Zip (Blank to use \"" + zip + "\"): ";
+		else
+			prompt = "Zip (##### or #####-####):";
+		prompt = "Invalid Zip\n" + prompt;
 		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return false;
+		}
 		if(line.length() == 0){
 			continue;
 		}
@@ -1446,13 +1508,25 @@ void System::editAccount(){
 	if(line.length() != 0){
 		zip = line;
 	}
-	prompt = "Cell Phone (###-###-####): ";
+	if(cellPhone.length() > 0)
+		prompt = "Cell Phone (Blank to use \"" + cellPhone + "\"): ";
+	else
+		prompt = "Cell Phone (###-###-####): ";
 	validInput = false;
 	while(!validInput){
 		validInput = true;
 		std::cout << prompt;
-		prompt = "Invalid Phone Number\nCell Phone (###-###-####): ";
+		if(cellPhone.length() > 0)
+			prompt = "Cell Phone (Blank to use \"" + cellPhone + "\"): ";
+		else
+			prompt = "Cell Phone (###-###-####): ";
+		prompt = "Invalid Phone Number\n" + prompt;
 		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return false;
+		}
 		if(line.length() == 0){
 			continue;
 		}
@@ -1484,12 +1558,27 @@ void System::editAccount(){
 		cellPhone = line;
 	}
 	validInput = false;
-	prompt = "Home Phone (###-###-####): ";
+	if(homePhone.length() > 0)
+		prompt = "Home Phone (Blank to use \"" + homePhone + "\"): ";
+	else
+		prompt = "Home Phone (###-###-####): ";
 	while(!validInput){
 		validInput = true;
 		std::cout << prompt;
-		prompt = "Invalid Phone Number\nHome Phone (###-###-####): ";
+		if(homePhone.length() > 0)
+			prompt = "Home Phone (Blank to use \"" + homePhone + "\"): ";
+		else
+			prompt = "Home Phone (###-###-####): ";
+		prompt = "Invalid Phone Number\n" + prompt;
 		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return false;
+		}
+		if(line.length() == 0){
+			continue;
+		}
 		if(line.length() != 12){
 			validInput = false;
 			continue;
@@ -1517,13 +1606,26 @@ void System::editAccount(){
 	if(line.length() != 0){
 		homePhone = line;
 	}
-	std::cout << "Organization (Blank to use " + organization + "): ";
+	if(organization.length() > 0)
+		std::cout << "Organization (Blank to use \"" + organization + "\"): ";
+	else
+		std::cout << "Organization: ";
 	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return false;
+	}
 	if(line.length() > 0){
 		organization = line;
 	}
 	std::cout << "Tagger (Y/YES for yes, anything else for no): ";
 	std::getline(std::cin, line);
+	if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+		(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+		(line[3] == 't' || line[3] == 'T')){
+		return false;
+	}
 	if((line.length() == 1 && (line[0] == 'Y' || line[0] == 'y')) ||
 		(line.length() == 3 && (line[0] == 'Y' || line[0] == 'y') &&
 							   (line[1] == 'E' || line[1] == 'e') &&
@@ -1535,6 +1637,7 @@ void System::editAccount(){
 	}
 	users[currentUser].change(currentUser, realName, address, city, state, zip, homePhone, cellPhone, organization, tagger);
 	Storage::storeUsers(users);
+	return true;
 }
 void System::mainMenu(){
 	/*
@@ -1543,7 +1646,7 @@ void System::mainMenu(){
 	clear();
 	std::string line = "";
 	std::string prompt = "Enter Selection: ";
-	while(line.length() < 1 || line[0] != '8'){
+	while(line.length() < 1 || line[0] != '0'){
 		std::cout << programTitle << "\n";
 		std::cout << "Main Menu:\n\n"
 				  << "1. View All Users\n"
@@ -1553,11 +1656,11 @@ void System::mainMenu(){
 				  << "5. Import/Export\n"
 				  << "6. Delete Account\n"
 				  << "7. Edit Account\n"
-				  << "8. Exit\n";
+				  << "0. Exit\n";
 		std::cout << '\n';
 		std::cout << prompt;
 		std::getline(std::cin, line);
-		if(line.length() < 1 || line[0] < '1' || line[0] > '8'){
+		if(line.length() < 1 || line[0] < '0' || line[0] > '7'){
 			prompt = "Invalid selection\nEnter Selection: ";
 			std::cout << std::string(100, '\n');
 		}
@@ -1581,20 +1684,24 @@ void System::mainMenu(){
 					break;
 				case '6':
 					if(deleteAccount()){
-						line = "8";
+						line = "0";
 					}
 					else{
 						prompt = "Delete cancelled\n" + prompt;
 					}
 					break;
 				case '7':
-					editAccount();
-					prompt = "Account updated\n" + prompt;
-				case '8':
+					if(editAccount()){
+						prompt = "Account updated\n" + prompt;
+					}
+					else{
+						prompt = "Account update cancelled\n" + prompt;
+					}
+				case '0':
 					quit();
 					break;
 			};
-			if(line[0] != '8'){
+			if(line[0] != '0'){
 				clear();
 			}
 		}
