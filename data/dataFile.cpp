@@ -21,14 +21,14 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 	if(outFile.is_open()){
 		line = "";
 		prompt = "Enter selection: ";
-		while(line.length() < 1 && !(line[0] >= '1' && line[0] <= '4')){
+		while(line.length() < 1 && !(line[0] >= '0' && line[0] <= '3')){
 			std::cout << System::programTitle << "\n";
 			std::cout << "Export Menu:\n"
 					  << "FilePath: " << path << "\n"
 					  << "1. Export All Sightings\n"
 					  << "2. Export Sightings for Location\n"
 					  << "3. Export Sightings for Tag\n"
-					  << "4. Cancel\n\n";
+					  << "0. Exit\n\n";
 			std::cout << prompt;
 			std::getline(std::cin, line);
 			prompt = "Invalid option\nEnter selection: ";
@@ -123,7 +123,7 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 				break;
 			case '3':
 				{
-					std::cout << "Enter Tag Number (Blank for untagged): ";
+					std::cout << "Enter Tag ID (Enter for untagged): ";
 					std::getline(std::cin, line);
 					std::map<std::string, std::vector<Sighting*> >::iterator iter = tagSightings.find(line);
 					if(iter != tagSightings.end() && iter->second.size() > 0){
@@ -159,11 +159,11 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 						return "Sightings for Tag " + line + " exported to " + path;
 					}
 					else{
-						return "No sightings found for Tag# " + tagNum + ".";
+						return "No sightings found for Tag ID " + tagNum + ".";
 					}
 				}
 				break;
-			case '4':
+			case '0':
 				return "Export cancelled!";
 		};
 	}
@@ -320,6 +320,9 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 					(sighting.year == 1900 + curTime->tm_year && sighting.month == curTime->tm_mon + 1 && sighting.day > curTime->tm_mday)){
 					addError(errors, "Future date");
 					continue;
+				}
+				if(sighting.year < 1900){
+					addError(errors, "Date before 1900");
 				}
 				//	Date is valid up to this point
 

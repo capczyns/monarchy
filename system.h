@@ -26,7 +26,7 @@ private:
 	std::string reports();
 	void mainMenu();
 	void clear();
-	void editAccount();
+	bool editAccount();
 	std::string editSighting(Sighting& sighting);
 
 	std::map<std::string, User> users;

@@ -30,6 +30,7 @@ std::ostream& operator<< (std::ostream& out, const Weather& weather){
 			break;
 		case 0:
 			out << "with Clear Skies";
+			break;
 		default:
 			out << "and Partly Cloudy";
 	}
@@ -339,7 +340,7 @@ std::ostream& operator<<(std::ostream& out, const Sighting& sighting){
 	out << std::endl;
 	out << "Species: " << sighting.species;
 	if(sighting.tagNum.length() > 0){
-		out << "     Tag Number: " << sighting.tagNum;
+		out << "     Tag ID: " << sighting.tagNum;
 	}
 	out << "\n" << sighting.weather;
 	return out;
@@ -401,7 +402,7 @@ std::ostream& operator<<(std::ostream& out, const SightingData& sighting){
 	out << std::endl;
 	out << "Species: " << sighting.species;
 	if(sighting.tagNum.length() > 0){
-		out << "     Tag Number: " << sighting.tagNum;
+		out << "     Tag ID: " << sighting.tagNum;
 	}
 	out << "\n" << sighting.weather;
 	return out;
