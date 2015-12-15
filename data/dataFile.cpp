@@ -4,8 +4,8 @@ void DataFile::setSeqNum(unsigned int next){
 	seqNumber = next;
 }
 std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sightings, std::map<std::string, Butterfly>& tags,
-							 std::map<std::string, std::vector<Sighting*> > tagSightings,
-							 std::map<std::string, std::vector<Sighting*> > locationSightings){
+							 std::map<std::string, std::vector<Sighting*> >& tagSightings,
+							 std::map<std::string, std::vector<Sighting*> >& locationSightings){
 	std::string line;
 	std::string path;
 	std::cout << "Enter path to export file, (directory structure must exist; \".txt\" added to the end automatically)\n: ";
@@ -210,10 +210,10 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 }
 std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 							 std::map<std::string, Butterfly>& tags,
-							 std::map<std::string, std::vector<Sighting*> > tagSightings,
-							 std::map<std::string, std::vector<Sighting*> > userSightings,
-							 std::map<std::string, std::vector<Sighting*> > dateSightings,
-							 std::map<std::string, std::vector<Sighting*> > locationSightings){
+							 std::map<std::string, std::vector<Sighting*> >& tagSightings,
+							 std::map<std::string, std::vector<Sighting*> >& userSightings,
+							 std::map<std::string, std::vector<Sighting*> >& dateSightings,
+							 std::map<std::string, std::vector<Sighting*> >& locationSightings){
 	std::string line, path, temp;
 	std::cout << System::programTitle << "\nFile Import\n\n";
 	std::cout << "Enter path to import file: ";
@@ -261,6 +261,7 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 			return(ss.str());
 		}
 		while(!trFound && std::getline(inFile, line)){
+			sighting = SightingData();
 			if(line.length() >= 2 && line.substr(0,2).compare("TR") == 0){
 				trFound = true;
 				index = 2;
@@ -471,30 +472,30 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 
 				//	Everything up to City is valid
 				sighting.city = line.substr(55, 30);
-				index = sighting.city.find_last_not_of(' ') + 1;
+				index = sighting.city.find_last_not_of(' ');
 				if(index == std::string::npos){
 					sighting.city = "";
 				}
 				else{
-					sighting.city = sighting.city.substr(0, index);
+					sighting.city = sighting.city.substr(0, index + 1);
 				}
 
 				sighting.state = line.substr(85, 30);
-				index = sighting.state.find_last_not_of(' ') + 1;
+				index = sighting.state.find_last_not_of(' ');
 				if(index == std::string::npos){
 					sighting.state = "";
 				}
 				else{
-					sighting.state = sighting.state.substr(0, index);
+					sighting.state = sighting.state.substr(0, index + 1);
 				}
 
 				sighting.country = line.substr(115, 30);
-				index = sighting.country.find_last_not_of(' ') + 1;
+				index = sighting.country.find_last_not_of(' ');
 				if(index == std::string::npos){
 					sighting.country = "";
 				}
 				else{
-					sighting.country = sighting.country.substr(0, index);
+					sighting.country = sighting.country.substr(0, index + 1);
 				}
 
 				if((sighting.latitude == 0 && sighting.longitude == 0) && 
@@ -504,16 +505,16 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 				}
 
 				sighting.species = line.substr(145, 20);
-				index = sighting.species.find_last_not_of(' ') + 1;
+				index = sighting.species.find_last_not_of(' ');
 				if(index == std::string::npos){
 					addError(errors, "No Species Specified");
 					continue;
 				}
 				else{
-					sighting.species = sighting.species.substr(0, index);
+					sighting.species = sighting.species.substr(0, index + 1);
 				}
-				sighting.tagNum = line.substr(165);
-				index = sighting.tagNum.find_last_not_of(' ') + 1;
+				sighting.tagNum = line.substr(165,6);
+				index = sighting.tagNum.find_last_not_of(' ');
 				if(tagging && index == std::string::npos){
 					addError(errors, "Tagging with no tag number specified");
 				}
@@ -521,9 +522,8 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 					sighting.tagNum = "";
 				}
 				else{
-					sighting.tagNum = sighting.tagNum.substr(0, index);
+					sighting.tagNum = sighting.tagNum.substr(0, index + 1);
 				}
-
 				if(tagging){
 					tagIter = tags.find(sighting.tagNum);
 					if(tagIter != tags.end()){
@@ -654,6 +654,12 @@ unsigned int DataFile::parseHeader(std::string& header){
 	if(seqNum.length() < 1){
 		return 0;
 	}
+	std::stringstream ss(seqNum);
+	unsigned int seqNumm = 0;
+	ss.seekg(0);
+	ss.clear();
+	ss >> seqNumm;
+
 	while(index < header.length() && header[index] == ' '){
 		++index;
 	}
@@ -684,12 +690,6 @@ unsigned int DataFile::parseHeader(std::string& header){
 	while(index < header.length() && header[index] == ' '){
 		++index;
 	}
-	if(index != header.length()){
-		return 0;
-	}
 
-	std::stringstream ss(seqNum);
-	unsigned int seqNumm = 0;
-	ss >> seqNumm;
 	return seqNumm;
 }

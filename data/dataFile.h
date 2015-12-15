@@ -21,14 +21,14 @@ private:
 	static void addError(std::map<std::string, int>& errors, std::string error);
 public:
 	static std::string exportSightings(std::map<unsigned int, Sighting>& sightings, std::map<std::string, Butterfly>& tags,
-							  std::map<std::string, std::vector<Sighting*> > tagSightings,
-							 std::map<std::string, std::vector<Sighting*> > locationSightings);
+							  std::map<std::string, std::vector<Sighting*> >& tagSightings,
+							 std::map<std::string, std::vector<Sighting*> >& locationSightings);
 	static std::string import(std::map<unsigned int, Sighting>& sightings,
 							  std::map<std::string, Butterfly>& tags,
-							  std::map<std::string, std::vector<Sighting*> > tagSightings,
-							  std::map<std::string, std::vector<Sighting*> > userSightings,
-							  std::map<std::string, std::vector<Sighting*> > dateSightings,
-							  std::map<std::string, std::vector<Sighting*> > locationSightings);
+							  std::map<std::string, std::vector<Sighting*> >& tagSightings,
+							  std::map<std::string, std::vector<Sighting*> >& userSightings,
+							  std::map<std::string, std::vector<Sighting*> >& dateSightings,
+							  std::map<std::string, std::vector<Sighting*> >& locationSightings);
 	static void setSeqNum(unsigned int next);
 };
 #endif
