@@ -8,7 +8,7 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 							 std::map<std::string, std::vector<Sighting*> > locationSightings){
 	std::string line;
 	std::string path;
-	std::cout << "Enter path to export file (directory structure must exist)\n: ";
+	std::cout << "Enter path to export file, (directory structure must exist; \".txt\" added to the end automatically)\n: ";
 	std::getline(std::cin, path);
 	if(path.length() == 4 && (path[0] == 'e' || path[0] == 'E') &&
 		(path[1] == 'x' || path[1] == 'X') && (path[2] == 'i' || path[2] == 'I') &&
@@ -304,21 +304,26 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 					addError(errors, "Line too short");
 					continue;
 				}
+				if(sighting.reporter.find_last_not_of(' ') == std::string::npos){
+					addError(errors, "No reporter/tagger specified");
+					continue;
+				}
+				sighting.reporter = sighting.reporter.substr(0, sighting.reporter.find_last_not_of(' ') + 1);
 				if(line.length() < 171){
 					addError(errors, "Line too short");
 					continue;
 				}
 				temp = line.substr(12, 4);
-				if((temp.compare(std::string(4, '9' + 1)) > 0) ||
-					temp.compare(std::string(4, '0' - 1)) < 0){
+				if((temp.compare(std::string(4, '9')) > 0) ||
+					temp.compare(std::string(4, '0')) < 0){
 					addError(errors, "Invalid year");
 					continue;
 				}
 				prepStream(ss, temp);
 				ss >> sighting.year;
 				temp = line.substr(17, 2);
-				if((temp.compare(std::string(2, '9' + 1)) > 0) ||
-					temp.compare(std::string(2, '0' - 1)) < 0){
+				if((temp.compare(std::string(2, '9')) > 0) ||
+					temp.compare(std::string(2, '0')) < 0){
 					addError(errors, "Invalid month");
 					continue;
 				}
@@ -329,8 +334,8 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 					continue;
 				}
 				temp = line.substr(20, 2);
-				if((temp.compare(std::string(2, '9' + 1)) > 0) ||
-					temp.compare(std::string(2, '0' - 1)) < 0){
+				if((temp.compare(std::string(2, '9')) > 0) ||
+					temp.compare(std::string(2, '0')) < 0){
 					addError(errors, "Invalid day");
 					continue;
 				}
@@ -346,7 +351,7 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 							addError(errors, "Invalid day");
 							continue;
 						}
-						if(sighting.year % 4 == 0 && sighting.day > 28){
+						if(sighting.year % 4 != 0 && sighting.day > 28){
 							addError(errors, "Invalid day");
 							continue;
 						}
@@ -369,8 +374,8 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 				//	Date is valid up to this point
 
 				temp = line.substr(23, 2);
-				if((temp.compare(std::string(2, '9' + 1)) > 0) ||
-					temp.compare(std::string(2, '0' - 1)) < 0){
+				if((temp.compare(std::string(2, '9')) > 0) ||
+					temp.compare(std::string(2, '0')) < 0){
 					addError(errors, "Invalid hour");
 					continue;
 				}
@@ -381,27 +386,27 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 				}
 
 				temp = line.substr(26, 2);
-				if((temp.compare(std::string(2, '9' + 1)) > 0) ||
-					temp.compare(std::string(2, '0' - 1)) < 0){
+				if((temp.compare(std::string(2, '9')) > 0) ||
+					temp.compare(std::string(2, '0')) < 0){
 					addError(errors, "Invalid minute");
 					continue;
 				}
 				prepStream(ss, temp);
 				ss >> sighting.minute;
-				if(sighting.minute < 0 || sighting.minute > 60){
+				if(sighting.minute < 0 || sighting.minute > 59){
 					addError(errors, "Invalid minute");
 					continue;
 				}
 
 				temp = line.substr(29, 2);
-				if((temp.compare(std::string(2, '9' + 1)) > 0) ||
-					temp.compare(std::string(2, '0' - 1)) < 0){
+				if((temp.compare(std::string(2, '9')) > 0) ||
+					temp.compare(std::string(2, '0')) < 0){
 					addError(errors, "Invalid second");
 					continue;
 				}
 				prepStream(ss, temp);
 				ss >> sighting.second;
-				if(sighting.second < 0 || sighting.second > 60){
+				if(sighting.second < 0 || sighting.second > 59){
 					addError(errors, "Invalid second");
 					continue;
 				}
