@@ -2,6 +2,8 @@
 #define BUTTERFLY_H
 #include <string>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include "sighting.h"
 class ButterflyData{
 public:
@@ -52,6 +54,7 @@ public:
 	void saveStr(std::ostream& out);
 	std::string getSpecies();
 	bool sameSpecies(const std::string& other);
+	bool onDate(std::string date);
 	friend std::ostream& operator<<(std::ostream& out, Butterfly& butterfly);
 };
 #endif

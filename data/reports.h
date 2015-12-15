@@ -17,6 +17,7 @@ public:
 	static std::string speciesLocation(std::map<unsigned int, Sighting>& sightings);
 	static std::string sightingHistory(std::map<std::string, std::vector<Sighting*> >& dateSightings);
 	static std::string cityDateLookup(std::map<std::string, std::vector<Sighting*> >& dateSightings, std::map<std::string, std::vector<Sighting*> >& locationSightings);
+	static std::string tagDateLookup(std::map<std::string, Butterfly>& tags);
 private:
 	static double latLongDistance(double lat1, double long1, double lat2, double long2, bool km);
 	static void incrementFrequency(std::map<std::string, unsigned int>& frequency, std::string location);
