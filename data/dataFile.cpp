@@ -10,8 +10,14 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 	std::string path;
 	std::cout << "Enter path to export file (directory structure must exist)\n: ";
 	std::getline(std::cin, path);
+	if(path.length() == 4 && (path[0] == 'e' || path[0] == 'E') &&
+		(path[1] == 'x' || path[1] == 'X') && (path[2] == 'i' || path[2] == 'I') &&
+		(path[3] == 't' || path[3] == 'T')){
+		return "Export Cancelled";
+	}
+	path += ".txt";
 	std::ofstream outFile;
-	outFile.open(path, std::ofstream::trunc);
+	outFile.open(path, std::ofstream::app);
 	unsigned int numRecords = 0;
 
 	SightingData data;
@@ -19,6 +25,7 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 	std::string prompt, city, state, country, tagNum, firstDate, lastDate;
 
 	if(outFile.is_open()){
+		outFile.close();
 		line = "";
 		prompt = "Enter selection: ";
 		while(line.length() < 1 && !(line[0] >= '0' && line[0] <= '3')){
@@ -40,6 +47,7 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 					std::map<unsigned int, Sighting>::iterator end = sightings.end();
 					if(iter != end){
 						data  = iter->second.getData();
+						outFile.open(path, std::ofstream::trunc);
 						outFile << "HD" << std::string(10, ' ');
 						firstDate = data.dateStr();
 						lastDate = data.dateStr();
@@ -75,10 +83,25 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 				{
 					std::cout << "Enter City: ";
 					std::getline(std::cin, city);
+					if(city.length() == 4 && (city[0] == 'e' || city[0] == 'E') &&
+						(city[1] == 'x' || city[1] == 'X') && (city[2] == 'i' || city[2] == 'I') &&
+						(city[3] == 't' || city[3] == 'T')){
+						return "Export Cancelled";
+					}
 					std::cout << "Enter State: ";
 					std::getline(std::cin, state);
+					if(state.length() == 4 && (state[0] == 'e' || state[0] == 'E') &&
+						(state[1] == 'x' || state[1] == 'X') && (state[2] == 'i' || state[2] == 'I') &&
+						(state[3] == 't' || state[3] == 'T')){
+						return "Export Cancelled";
+					}
 					std::cout << "Enter Country: ";
 					std::getline(std::cin, country);
+					if(country.length() == 4 && (country[0] == 'e' || country[0] == 'E') &&
+						(country[1] == 'x' || country[1] == 'X') && (country[2] == 'i' || country[2] == 'I') &&
+						(country[3] == 't' || country[3] == 'T')){
+						return "Export Cancelled";
+					}
 					line = city.substr(0,30);
 					if(city.length() < 30){
 						line += std::string(30-city.length(), ' ');
@@ -90,6 +113,11 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 					line += country.substr(0,30);
 					if(country.length() < 30){
 						line += std::string(30-country.length(), ' ');
+					}
+					for(int index = 0; index < 90; ++index){
+						if(line[index] >= 'a' && line[index] <= 'z'){
+							line[index] -= ('a'-'A');
+						}
 					}
 					std::map<std::string, std::vector<Sighting*> >::iterator iter = locationSightings.find(line);
 					if(iter != locationSightings.end() && iter->second.size() > 0){
@@ -105,6 +133,7 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 								lastDate = data.dateStr();
 							}
 						}
+						outFile.open(path, std::ofstream::trunc);
 						outFile << "HD" << std::string(10, ' ') << firstDate << ' ' << lastDate << std::string(6, ' ') << "Location: " << city << ' ' << state << ' ' << country << std::endl;
 						for(int index = 0; index < iter->second.size(); ++index){
 							data = iter->second[index]->getData();
@@ -125,6 +154,11 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 				{
 					std::cout << "Enter Tag ID (Enter for untagged): ";
 					std::getline(std::cin, line);
+					if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+						(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+						(line[3] == 't' || line[3] == 'T')){
+						return "Export Cancelled";
+					}
 					std::map<std::string, std::vector<Sighting*> >::iterator iter = tagSightings.find(line);
 					if(iter != tagSightings.end() && iter->second.size() > 0){
 						data = iter->second[0]->getData();
@@ -139,6 +173,7 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 								lastDate = data.dateStr();
 							}
 						}
+						outFile.open(path, std::ofstream::trunc);
 						outFile << "HD" << std::string(10, ' ') << firstDate << ' ' << lastDate << std::string(6, ' ') << "Tag: ";
 						if(line.length() > 0){
 							outFile << line;
@@ -155,11 +190,13 @@ std::string DataFile::exportSightings(std::map<unsigned int, Sighting>& sighting
 						}
 						outFile << "TR " << std::setfill('0') << std::setw(6) << numRecords;
 						outFile.close();
-						line = "UNTAGGED";
+						if(line.length() < 1){
+							line = "UNTAGGED";
+						}
 						return "Sightings for Tag " + line + " exported to " + path;
 					}
 					else{
-						return "No sightings found for Tag ID " + tagNum + ".";
+						return "No sightings found for Tag ID " + line + ".";
 					}
 				}
 				break;
@@ -181,6 +218,11 @@ std::string DataFile::import(std::map<unsigned int, Sighting>& sightings,
 	std::cout << System::programTitle << "\nFile Import\n\n";
 	std::cout << "Enter path to import file: ";
 	std::getline(std::cin, path);
+	if(path.length() == 4 && (path[0] == 'e' || path[0] == 'E') &&
+		(path[1] == 'x' || path[1] == 'X') && (path[2] == 'i' || path[2] == 'I') &&
+		(path[3] == 't' || path[3] == 'T')){
+		return "Import Cancelled";
+	}
 	std::ifstream inFile(path);
 	bool trFound = false;
 	std::string hd;
