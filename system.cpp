@@ -3,7 +3,7 @@
 #include "external/ChrisHash.h"
 #include <iostream>
 #include <fstream>
-std::string System::versionNumber = "Version 0.0.4";
+std::string System::versionNumber = "Version 0.0.5";
 std::string System::programTitle = "Monarchy Butterfly Tracking System";
 void System::start(){
 	/*
@@ -57,6 +57,7 @@ bool System::createUser(){
 		validInput = pwd.length() > 0;
 		prompt = "\nPassword must not be empty\nPassword: ";
 	}
+	std::cout << '\n';
 	pwd = chrisLibs::sha256(pwd);
 	std::cout << "Name: ";
 	std::getline(std::cin, realName);
@@ -1353,7 +1354,7 @@ std::string System::reports(){
 	*/
 	std::string line = "";
 	std::string prompt = "\nEnter Selection: ";
-	while(line.length() < 1 || !(line[0] >= '0' && line[0] <= '6')){
+	while(line.length() < 1 || !(line[0] >= '0' && line[0] <= '7')){
 		clear();
 		std::cout << programTitle << "\n";
 		std::cout << "Reports Menu:\n\n"
@@ -1363,6 +1364,7 @@ std::string System::reports(){
 				  << "4. Species Location Report\n"
 				  << "5. Butterfly Sighting History\n"
 				  << "6. City/Date Lookup\n"
+				  << "7. Tag Lookup by Date\n"
 				  << "0. Exit\n";
 		std::cout << prompt;
 		std::getline(std::cin, line);
@@ -1387,6 +1389,10 @@ std::string System::reports(){
 			break;
 		case '6':
 			return Reports::cityDateLookup(dateSightings, locationSightings);
+			break;
+		case '7':
+			return Reports::tagDateLookup(tags);
+			break;
 		case '0':
 			return "";
 			break;
@@ -1415,7 +1421,7 @@ bool System::editAccount(){
 	clear();
 	std::cout << programTitle << "\nEdit Account\n\n";
 	if(realName.length() > 0)
-		std::cout << "Name (Blank to use \"" << realName << "\"): ";
+		std::cout << "Name (Enter to use \"" << realName << "\"): ";
 	else
 		std::cout << "Name: ";
 	std::getline(std::cin, line);
@@ -1428,7 +1434,7 @@ bool System::editAccount(){
 		realName = line;
 	}
 	if(address.length() > 0)
-		std::cout << "Street Address (Blank to use \"" << address << "\"): ";
+		std::cout << "Street Address (Enter to use \"" << address << "\"): ";
 	else
 		std::cout << "Street Address: ";
 	std::getline(std::cin, line);
@@ -1441,7 +1447,7 @@ bool System::editAccount(){
 		address = line;
 	}
 	if(city.length() > 0)
-		std::cout << "City (Blank to use \"" << city << "\"): ";
+		std::cout << "City (Enter to use \"" << city << "\"): ";
 	else
 		std::cout << "City: ";
 	std::getline(std::cin, line);
@@ -1454,7 +1460,7 @@ bool System::editAccount(){
 		city = line;
 	}
 	if(state.length() > 0)
-		std::cout << "State (Blank to use \"" << state << "\"): ";
+		std::cout << "State (Enter to use \"" << state << "\"): ";
 	else
 		std::cout << "State: ";
 	std::getline(std::cin, line);
@@ -1467,7 +1473,7 @@ bool System::editAccount(){
 		state = line;
 	}
 	if(zip.length() > 0)
-		prompt = "Zip (Blank to use \"" + zip + "\"): ";
+		prompt = "Zip (Enter to use \"" + zip + "\"): ";
 	else
 		prompt = "Zip (##### or #####-####):";
 	validInput = false;
@@ -1475,7 +1481,7 @@ bool System::editAccount(){
 		validInput = true;
 		std::cout << prompt;
 		if(zip.length() > 0)
-			prompt = "Zip (Blank to use \"" + zip + "\"): ";
+			prompt = "Zip (Enter to use \"" + zip + "\"): ";
 		else
 			prompt = "Zip (##### or #####-####):";
 		prompt = "Invalid Zip\n" + prompt;
@@ -1512,7 +1518,7 @@ bool System::editAccount(){
 		zip = line;
 	}
 	if(cellPhone.length() > 0)
-		prompt = "Cell Phone (Blank to use \"" + cellPhone + "\"): ";
+		prompt = "Cell Phone (Enter to use \"" + cellPhone + "\"): ";
 	else
 		prompt = "Cell Phone (###-###-####): ";
 	validInput = false;
@@ -1520,7 +1526,7 @@ bool System::editAccount(){
 		validInput = true;
 		std::cout << prompt;
 		if(cellPhone.length() > 0)
-			prompt = "Cell Phone (Blank to use \"" + cellPhone + "\"): ";
+			prompt = "Cell Phone (Enter to use \"" + cellPhone + "\"): ";
 		else
 			prompt = "Cell Phone (###-###-####): ";
 		prompt = "Invalid Phone Number\n" + prompt;
@@ -1562,7 +1568,7 @@ bool System::editAccount(){
 	}
 	validInput = false;
 	if(homePhone.length() > 0)
-		prompt = "Home Phone (Blank to use \"" + homePhone + "\"): ";
+		prompt = "Home Phone (Enter to use \"" + homePhone + "\"): ";
 	else
 		prompt = "Home Phone (###-###-####): ";
 	while(!validInput){
@@ -1610,7 +1616,7 @@ bool System::editAccount(){
 		homePhone = line;
 	}
 	if(organization.length() > 0)
-		std::cout << "Organization (Blank to use \"" + organization + "\"): ";
+		std::cout << "Organization (Enter to use \"" + organization + "\"): ";
 	else
 		std::cout << "Organization: ";
 	std::getline(std::cin, line);

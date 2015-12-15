@@ -764,3 +764,67 @@ std::string Reports::cityDateLookup(std::map<std::string, std::vector<Sighting*>
 		return "City/Date Lookup Completed";
 	}
 }
+std::string Reports::tagDateLookup(std::map<std::string, Butterfly>& tags){
+	std::string line;
+	std::string tagNum;
+	std::string date;
+	bool dateValid = false;
+	std::string prompt = "Monarchy Butterfly Tracking System\nTag Date Lookup.\n\nEnter Date (YYYY-MM-DD): ";
+	std::vector<Butterfly*> displayList;
+	while(!dateValid){
+		std::cout << std::string(100,'\n');
+		std::cout << prompt;
+		std::getline(std::cin, line);
+		if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+			(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+			(line[3] == 't' || line[3] == 'T')){
+			return "City/Date Lookup Cancelled.";
+		}
+		if(line.length() != 10){
+			prompt = "Monarchy Butterfly Tracking System\nTag Date Lookup.\n\nPlease use correct format.\nEnter Date (YYYY-MM-DD): ";
+			continue;
+		}
+		dateValid = true;
+		for(int index = 0; dateValid && index < 4; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				prompt = "Monarchy Butterfly Tracking System\nTag Date Lookup.\n\nPlease use correct format.\nEnter Date (YYYY-MM-DD): ";
+				dateValid = false;
+			}
+		}
+		for(int index = 5; dateValid && index < 7; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				prompt = "Monarchy Butterfly Tracking System\nTag Date Lookup.\n\nPlease use correct format.\nEnter Date (YYYY-MM-DD): ";
+				dateValid = false;
+			}
+		}
+		for(int index = 8; dateValid && index < 10; ++index){
+			if(line[index] < '0' || line[index] > '9'){
+				prompt = "Monarchy Butterfly Tracking System\nTag Date Lookup.\n\nPlease use correct format.\nEnter Date (YYYY-MM-DD): ";
+				dateValid = false;
+			}
+		}
+		if(dateValid){
+			date = line;
+		}
+	}
+	std::map<std::string, Butterfly>::iterator iter = tags.begin();
+	while(iter != tags.end()){
+		if(iter->second.onDate(date)){
+			displayList.push_back(&iter->second);
+		}
+		++iter;
+	}
+	if(displayList.size() < 1){
+		return "No taggings found for " + date + ".";
+	}
+	for(int index = 0 ;index < displayList.size(); ++index){
+		std::cout << *displayList[index] << "\n\n";
+		if(index % 4 == 3){
+			std::cout << "Press enter for more or \"exit\" to cancel: ";
+			std::getline(std::cin, line);
+		}
+	}
+	std::cout << "Press enter to exit: ";
+	std::getline(std::cin, line);
+	return "Tag Date Lookup Complete";
+}

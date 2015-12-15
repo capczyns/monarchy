@@ -157,3 +157,36 @@ void ButterflyData::fromSighting(SightingData& data){
 	latitude = data.latitude;
 	longitude = data.longitude;
 }
+bool Butterfly::onDate(std::string date){
+	if(date.length() != 10){
+		return false;
+	}
+	date[4] = '-';
+	date[7] = '-';
+	std::stringstream ss;
+	ss << std::setfill('0') << std::setw(4) << year << '-' << std::setw(2) << month << '-' << std::setw(2) << day;
+	return date.compare(ss.str()) == 0;
+}
+std::ostream& operator<< (std::ostream& out, Butterfly& butterfly){
+	out << "Tag ID: " << butterfly.tagNum << "     Species: " << butterfly.species << '\n'
+		<< "Tagger: " << butterfly.tagger << "     Date: "
+		<< std::setfill('0') << std::setw(2)
+		<< butterfly.year << '-' << std::setw(2) << butterfly.month << '-' << std::setw(2) << butterfly.day << "     Time: "
+		<< std::setw(2) << butterfly.hour << ':' << std::setw(2) << butterfly.minute << ':' << std::setw(2) << butterfly.second << std::endl;
+
+	if(butterfly.latitude > 0 || butterfly.latitude < 0 || butterfly.longitude > 0 || butterfly.longitude < 0){
+		out << "Location: ";
+		if(butterfly.latitude >= 0){
+			out << '+';
+		}
+		out << butterfly.latitude << ",";
+		if(butterfly.longitude >= 0){
+			out << '+';
+		}
+		out << butterfly.longitude << "     ";
+	}
+	if(butterfly.city.length() > 0){
+		out << butterfly.city << ", " << butterfly.state << ", " << butterfly.country;
+	}
+	return out;
+}
