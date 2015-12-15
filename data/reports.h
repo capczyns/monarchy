@@ -16,6 +16,7 @@ public:
 	static std::string userRankings(std::map<std::string, std::vector<Sighting*> >& userSightings, std::map<std::string, User>& users, std::string currentUser);
 	static std::string speciesLocation(std::map<unsigned int, Sighting>& sightings);
 	static std::string sightingHistory(std::map<std::string, std::vector<Sighting*> >& dateSightings);
+	static std::string cityDateLookup(std::map<std::string, std::vector<Sighting*> >& dateSightings, std::map<std::string, std::vector<Sighting*> >& locationSightings);
 private:
 	static double latLongDistance(double lat1, double long1, double lat2, double long2, bool km);
 	static void incrementFrequency(std::map<std::string, unsigned int>& frequency, std::string location);
