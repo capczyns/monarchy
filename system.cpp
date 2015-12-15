@@ -3,7 +3,7 @@
 #include "external/ChrisHash.h"
 #include <iostream>
 #include <fstream>
-std::string System::versionNumber = "Version 0.0.7";
+std::string System::versionNumber = "Version 1.0.0";
 std::string System::programTitle = "Monarchy Butterfly Tracking System";
 void System::start(){
 	/*
