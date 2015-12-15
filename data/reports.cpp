@@ -592,3 +592,175 @@ std::string Reports::sightingHistory(std::map<std::string, std::vector<Sighting*
 
 	*/
 }
+std::string Reports::cityDateLookup(std::map<std::string, std::vector<Sighting*> >& dateSightings, std::map<std::string, std::vector<Sighting*> >& locationSightings){
+	std::string line;
+	std::string prompt;
+	std::string date;
+	std::string city;
+	std::string state;
+	std::string country;
+	std::string cityStr;
+	SightingData data;
+
+	prompt = "Monarchy Butterfly Tracking System\nCity/Date Lookup\n\nEnter Date (YYYY-MM-DD): ";
+	bool validInput = false;
+	bool dateValid;
+	while(!validInput){
+		dateValid = false;
+		while(!dateValid){
+			std::cout << std::string(100,'\n');
+			std::cout << prompt;
+			std::getline(std::cin, line);
+			if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+				(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+				(line[3] == 't' || line[3] == 'T')){
+				return "City/Date Lookup Cancelled.";
+			}
+			if(line.length() == 0){
+				dateValid = true;
+				continue;
+			}
+			if(line.length() != 10){
+				prompt = "Monarchy Butterfly Tracking System\nCity/Date Lookup\n\nPlease use correct format.\nEnter Date (YYYY-MM-DD): ";
+				continue;
+			}
+			dateValid = true;
+			for(int index = 0; dateValid && index < 4; ++index){
+				if(line[index] < '0' || line[index] > '9'){
+					prompt = "Monarchy Butterfly Tracking System\nCity/Date Lookup\n\nPlease use correct format.\nEnter Date (YYYY-MM-DD): ";
+					dateValid = false;
+				}
+			}
+			for(int index = 5; dateValid && index < 7; ++index){
+				if(line[index] < '0' || line[index] > '9'){
+					prompt = "Monarchy Butterfly Tracking System\nCity/Date Lookup\n\nPlease use correct format.\nEnter Date (YYYY-MM-DD): ";
+					dateValid = false;
+				}
+			}
+			for(int index = 8; dateValid && index < 10; ++index){
+				if(line[index] < '0' || line[index] > '9'){
+					prompt = "Monarchy Butterfly Tracking System\nCity/Date Lookup\n\nPlease use correct format.\nEnter Date (YYYY-MM-DD): ";
+					dateValid = false;
+				}
+			}
+			if(dateValid){
+				date = line;
+				validInput = true;
+			}
+		}
+		std::cout << "City: ";
+		std::getline(std::cin, city);
+		if(city.length() == 4 && (city[0] == 'e' || city[0] == 'E') &&
+			(city[1] == 'x' || city[1] == 'X') && (city[2] == 'i' || city[2] == 'I') &&
+			(city[3] == 't' || city[3] == 'T')){
+			return "City/Date Lookup Cancelled.";
+		}
+		std::cout << "State: ";
+		std::getline(std::cin, state);
+		if(state.length() == 4 && (state[0] == 'e' || state[0] == 'E') &&
+			(state[1] == 'x' || state[1] == 'X') && (state[2] == 'i' || state[2] == 'I') &&
+			(state[3] == 't' || state[3] == 'T')){
+			return "City/Date Lookup Cancelled.";
+		}
+		std::cout << "Country: ";
+		std::getline(std::cin, country);
+		if(country.length() == 4 && (country[0] == 'e' || country[0] == 'E') &&
+			(country[1] == 'x' || country[1] == 'X') && (country[2] == 'i' || country[2] == 'I') &&
+			(country[3] == 't' || country[3] == 'T')){
+			return "City/Date Lookup Cancelled.";
+		}
+		data.city = city;
+		data.state = state;
+		data.country = country;
+		if(city.length() > 0 || state.length() > 0 || country.length() > 0){
+			validInput = true;
+		}
+		prompt = "Monarchy Butterfly Tracking System\nCity/Date Lookup\n\nMust enter a date, a location, or both\nDate (YYYY-MM-DD): ";
+	}
+	std::map<std::string, std::vector<Sighting*> >::iterator iter;
+	std::vector<Sighting*> sightings;
+	cityStr = data.cityStr();
+	std::cout << "\n\n";
+	if(date.length() > 0){
+		//	Date and possibly locations
+		if(data.city.length() > 0 || data.state.length() > 0 || data.country.length() > 0){
+			//	Date and location
+			iter = dateSightings.find(date);
+			if(iter == dateSightings.end()){
+				return "No sightings found for " + date + ".";
+			}
+			for(int index = 0; index < iter->second.size(); ++index){
+				data = iter->second[index]->getData();
+				if(cityStr.compare(data.cityStr()) == 0){
+					sightings.push_back(iter->second[index]);
+				}
+			}
+			if(sightings.size() < 1){
+				return "No sightings found on " + date + " in " + city + ", " + state + ", " + country + ".";
+			}
+			std::cout << "Sightings on " + date + " in " + city + ", " + state + ", " + country + ":\n\n";
+			for(int index = 0; index < sightings.size(); ++index){
+				data = sightings[index]->getData();
+				std::cout << data << "\n\n";
+				if(index % 4 == 3){
+					std::cout << "Press Enter for more or \"exit\" to cancel: ";
+					std::getline(std::cin, line);
+					if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+						(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+						(line[3] == 't' || line[3] == 'T')){
+						return "City/Date Lookup Cancelled.";
+					}
+				}
+			}
+			std::cout << "Press Enter to exit: ";
+			std::getline(std::cin, line);
+			return "City/Date Lookup Completed";
+		}
+		else{
+			iter = dateSightings.find(date);
+			if(iter == dateSightings.end()){
+				return "No sightings found for " + date + ".";
+			}
+			std::cout << "Sightings on " + date + ":\n\n";
+			for(int index = 0; index < iter->second.size(); ++index){
+				data = iter->second[index]->getData();
+				std::cout << data << "\n\n";
+				if(index % 4 == 3){
+					std::cout << "Press Enter for more or \"exit\" to cancel: ";
+					std::getline(std::cin, line);
+					if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+						(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+						(line[3] == 't' || line[3] == 'T')){
+						return "City/Date Lookup Cancelled.";
+					}
+				}
+			}
+			std::cout << "Press Enter to exit: ";
+			std::getline(std::cin, line);
+			return "City/Date Lookup Completed";
+		}
+	}
+	else{
+		iter = locationSightings.find(cityStr);
+		if(iter == locationSightings.end()){
+			return "No sightings found for " + city + ", " + state + ", " + country + ".";
+		}
+		std::cout << "Sightings for " + city + ", " + state + ", " + country + ":\n\n";;
+		for(int index = 0; index < iter->second.size(); ++index){
+			data = iter->second[index]->getData();
+			std::cout << data << "\n\n";
+			if(index % 4 == 3){
+				std::cout << "Press Enter for more or \"exit\" to cancel: ";
+				std::getline(std::cin, line);
+				if(line.length() == 4 && (line[0] == 'e' || line[0] == 'E') &&
+					(line[1] == 'x' || line[1] == 'X') && (line[2] == 'i' || line[2] == 'I') &&
+					(line[3] == 't' || line[3] == 'T')){
+					return "City/Date Lookup Cancelled.";
+				}
+			}
+		}
+		std::cout << "Press Enter to exit: ";
+		std::getline(std::cin, line);
+		return "City/Date Lookup Completed";
+	}
+}

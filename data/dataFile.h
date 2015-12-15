@@ -45,10 +45,12 @@ public:
 		Entry:
 			every entry is a new line
 			every entry has at least 171 characters
-			1 char entry type
+			1 char entry type (S or T)
 			1 space
 			10 char username
-			19 char date + time
+			10 char date
+			1 space
+			8 char time
 			1 space
 			10 char latitude
 			10 char longitude
@@ -57,7 +59,7 @@ public:
 			30 char state
 			30 char country
 			20 char species
-			at least 6 char tag
+			at least 6 char tag (Any non-blank string)
 
 		Trailing Record:
 			TR

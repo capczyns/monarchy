@@ -3,7 +3,7 @@
 #include "external/ChrisHash.h"
 #include <iostream>
 #include <fstream>
-std::string System::versionNumber = "Version 0.0.3";
+std::string System::versionNumber = "Version 0.0.4";
 std::string System::programTitle = "Monarchy Butterfly Tracking System";
 void System::start(){
 	/*
@@ -1353,7 +1353,7 @@ std::string System::reports(){
 	*/
 	std::string line = "";
 	std::string prompt = "\nEnter Selection: ";
-	while(line.length() < 1 || !(line[0] >= '0' && line[0] <= '5')){
+	while(line.length() < 1 || !(line[0] >= '0' && line[0] <= '6')){
 		clear();
 		std::cout << programTitle << "\n";
 		std::cout << "Reports Menu:\n\n"
@@ -1362,6 +1362,7 @@ std::string System::reports(){
 				  << "3. User Rankings Report\n"
 				  << "4. Species Location Report\n"
 				  << "5. Butterfly Sighting History\n"
+				  << "6. City/Date Lookup\n"
 				  << "0. Exit\n";
 		std::cout << prompt;
 		std::getline(std::cin, line);
@@ -1384,6 +1385,8 @@ std::string System::reports(){
 		case '5':
 			return Reports::sightingHistory(dateSightings);
 			break;
+		case '6':
+			return Reports::cityDateLookup(dateSightings, locationSightings);
 		case '0':
 			return "";
 			break;
