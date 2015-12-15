@@ -485,13 +485,13 @@ std::string Reports::speciesLocation(std::map<unsigned int, Sighting>& sightings
 	}
 	std::cout << "Best locations to find " << species << " butterflies:\n";
 	if(num1 > 0){
-		std::cout << "1. " << loc1 << " with " << num1 << " tagged sightings\n";
+		std::cout << "1. " << loc1 << " with " << num1 << " sightings\n";
 	}
 	if(num2 > 0){
-		std::cout << "2. " << loc2 << " with " << num2 << " tagged sightings\n";
+		std::cout << "2. " << loc2 << " with " << num2 << " sightings\n";
 	}
 	if(num3 > 0){
-		std::cout << "3. " << loc3 << " with " << num3 << " tagged sightings\n";
+		std::cout << "3. " << loc3 << " with " << num3 << " sightings\n";
 	}
 	std::cout << "\n\nEnter to continue: ";
 	std::getline(std::cin, line);

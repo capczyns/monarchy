@@ -704,6 +704,7 @@ std::string System::editSighting(Sighting& sighting){
 						data.tagNum = line;
 						tags[data.tagNum] = Butterfly(currentUser, data.tagNum, data.species, data.city, data.state, data.country,
 													  data.day, data.month, data.year, data.hour, data.minute, data.second, data.latitude, data.longitude);
+						Storage::saveTag(tags[data.tagNum]);
 
 					}
 					else{
@@ -767,17 +768,6 @@ std::string System::editSighting(Sighting& sighting){
 		if(iter != end){
 			locationSightings[oldCity].erase(iter);
 			locationSightings[data.cityStr()].push_back(addr);
-		}
-	}
-	if(!(oldTag.compare(data.tagNum) == 0)){
-		iter = tagSightings[oldTag].begin();
-		end = tagSightings[oldTag].end();
-		while(iter != end && (*iter)->getId() != data.id){
-			iter++;
-		}
-		if(iter != end){
-			tagSightings[oldTag].erase(iter);
-			tagSightings[data.tagNum].push_back(addr);
 		}
 	}
 
@@ -1104,6 +1094,7 @@ std::string System::createSighting(){
 					validInput = true;
 					tags[data.tagNum] = Butterfly(currentUser, data.tagNum, data.species, data.city, data.state, data.country,
 												  data.day, data.month, data.year, data.hour, data.minute, data.second, data.latitude, data.longitude);
+					Storage::saveTag(tags[data.tagNum]);
 
 				}
 				else{
@@ -1139,9 +1130,6 @@ std::string System::createSighting(){
 	dateSightings[data.dateStr()].push_back(addr);
 
 	Storage::saveSighting(sightings[data.id]);
-	if(data.tagNum.length() > 0){
-		Storage::saveTag(tags[data.tagNum]);
-	}
 	ss.str(std::string());
 	ss.seekg(0);
 	ss.clear();
@@ -1163,7 +1151,7 @@ void System::viewUsers(){
 	std::map<std::string, User>::iterator iter = users.begin();
 	while(iter != users.end() && line.compare("EXIT") != 0){
 		for(int index = 0; index < 4 && iter != users.end(); ++index){
-			std::cout << iter->second << '\n';
+			std::cout << iter->second << "\n\n";
 			++iter;
 		}
 		if(iter != users.end()){
