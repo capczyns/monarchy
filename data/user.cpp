@@ -77,32 +77,32 @@ std::ostream& operator<<(std::ostream& out, const User& user){
 
 	out << "     Organization: ";
 	if(user.organization.length() == 0)
-		out << "Unlisted";
+		out << "Unlisted\n";
 	else
 		out << user.organization << std::endl;
 
 	out << "Address: ";
 	if(user.address.length() == 0)
-		out << "Unlisted Address,";
+		out << "Unlisted Address, ";
 	else
 		out << user.address << ", ";
 
 	if(user.city.length() ==0)
-		out << "Unlisted City,";
+		out << "Unlisted City, ";
 	else
 		out << user.city << ", ";
 
 	if(user.state.length() == 0)
-		out << "Unlisted State,";
+		out << "Unlisted State, ";
 	else
 		out << user.state << " ";
 
 	if(user.zip.length() == 0)
 		out << "Unlisted Zip";
 	else
-		out << user.zip << std::endl;
+		out << user.zip;
 
-	out << "Cell #: ";
+	out << "\nCell #: ";
 	if(user.cellPhone.length() == 0)
 		out << "Unlisted";
 	else
@@ -112,7 +112,7 @@ std::ostream& operator<<(std::ostream& out, const User& user){
 	if(user.homePhone.length() == 0)
 		out << "Unlisted";
 	else
-		out << user.homePhone << std::endl;
+		out << user.homePhone;
 	return out;
 }
 bool User::canLogin(){
